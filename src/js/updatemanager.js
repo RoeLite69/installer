@@ -34,8 +34,12 @@ async function getLatestReleaseInfo() {
       return map;
     }
     const release = JSON.parse(releaseData);
-    if (!release || !release.name || !release.assets) {
-      log.error('Failed JSONifying release, or no assets/name found.');
+    if (!release) {
+      log.error('Failed JSONifying.');
+      return map;
+    }
+    if (!release.name || !release.assets) {
+      console.error('Failed finding release name/assets, response:', release.status);
       return map;
     }
     const version = release.name;
