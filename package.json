@@ -1,0 +1,38 @@
+{
+  "name": "roelite",
+  "description": "RoeLite",
+  "version": "2.0.5",
+  "productName": "RoeLite",
+  "main": "src/electron.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "makemac": "electron-forge make --platform=darwin",
+    "publish": "electron-forge publish",
+    "prettier": "prettier --write \"**/*.js\"",
+    "lint": "echo \"No linting configured\""
+  },
+  "config": {
+    "forge": "./forge.config.js"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Roe",
+    "email": "88600811+roe69@users.noreply.github.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "electron-log": "^5.1.1",
+    "electron-squirrel-startup": "^1.0.0",
+    "extract-zip": "^2.0.1",
+    "prettier": "^3.3.3",
+    "semver": "^7.6.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-dmg": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "electron": "30.0.0-beta.5"
+  }
+}
