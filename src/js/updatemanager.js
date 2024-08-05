@@ -56,12 +56,6 @@ async function getLatestReleaseInfo() {
   return map;
 }
 
-// Update the local version file
-function updateLocalVersion(version) {
-  fs.writeFileSync(LOCAL_VER_PATH, version);
-  log.info(`Local version updated to: ${version}`);
-}
-
 // Check for updates and handle the update process
 async function checkForUpdates(mainWindow) {
   try {
@@ -135,11 +129,11 @@ function dlUrl(window, url, remoteVersion) {
         fileStream.on('finish', () => {
           fileStream.close(() => {
             log.info('Update downloaded, starting the update process...');
+            fs.writeFileSync(LOCAL_VER_PATH, remoteVersion);
             exec(updateExePath, error => {
               if (error) {
                 log.error(`Error executing update: ${error}`);
               }
-              updateLocalVersion(remoteVersion);
               app.quit(); // Quit the app to allow the installer to run
             });
           });
