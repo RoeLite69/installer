@@ -10,15 +10,23 @@ const JAVA_BIN = path.join(ROELITE_DIR, 'jre', 'bin');
 const JDK_ZIP_PATH = path.join(ROELITE_DIR, 'openjdk-11.zip');
 
 async function checkJava(mainWindow) {
-  fs.unlink(JDK_ZIP_PATH, () => {
-  });
-  checkJavaVersion(jdk => {
+  // Attempt to delete existing JDK zip file
+  await fs.unlink(JDK_ZIP_PATH, () => {});
+  checkJavaVersion(async jdk => {
     if (jdk) {
-      mainWindow.send('versionInfo', {
-        jdk
-      });
+      mainWindow.webContents.send('versionInfo', {jdk});
     } else {
-      installJava11();
+      mainWindow.webContents.send('versionInfo', {jdk: `Downloading (0%)...`});
+      await installJava11(mainWindow);
+      // After installation, recheck the Java version
+      checkJavaVersion(jdk => {
+        if (jdk) {
+          mainWindow.webContents.send('versionInfo', {jdk});
+        } else {
+          mainWindow.webContents.send('versionInfo', {jdk: 'ERROR!'});
+          log.error('Failed to install Java 11 correctly.');
+        }
+      });
     }
   });
 }
@@ -27,8 +35,8 @@ async function checkJava(mainWindow) {
 function checkJavaVersion(callback) {
   exec(`"${JAVA_BIN}/java.exe" -version`, (error, stdout, stderr) => {
     if (error) {
-      log.error('Error checking Java version: ' + error);
-      return callback(null);
+      callback(null);
+      return;
     }
     const versionMatch = stderr.match(/version "(\d+\.\d+\.\d+)/);
     const version = versionMatch ? versionMatch[1] : null;
@@ -38,34 +46,54 @@ function checkJavaVersion(callback) {
 }
 
 // Function to download and install Java 11
-function installJava11() {
+async function installJava11(mainWindow) {
   const jdkUrl = 'https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.22%2B7/OpenJDK11U-jre_x64_windows_hotspot_11.0.22_7.zip';
   const request = net.request(jdkUrl);
-  request.on('response', response => {
-    let downloadedBytes = 0;
-    const writeStream = fs.createWriteStream(JDK_ZIP_PATH);
-    response.on('data', chunk => {
-      writeStream.write(chunk);
-      downloadedBytes += chunk.length;
+  return new Promise((resolve, reject) => {
+    request.on('response', response => {
+      const writeStream = fs.createWriteStream(JDK_ZIP_PATH);
+      let downloadedBytes = 0;
+      const totalBytes = parseInt(response.headers['content-length'], 10);
+      response.on('data', chunk => {
+        writeStream.write(chunk);
+        downloadedBytes += chunk.length;
+        const progress = Math.floor((downloadedBytes / totalBytes) * 100);
+        try {
+          mainWindow.webContents.send('versionInfo', {jdk: `Downloading (${progress}%)...`});
+        } catch (e) {}
+      });
+      response.on('end', () => {
+        writeStream.end();
+        try {
+          mainWindow.webContents.send('versionInfo', {jdk: `Extracting...`});
+        } catch (e) {}
+        extract(JDK_ZIP_PATH, {dir: path.join(ROELITE_DIR)})
+          .then(() => {
+            try {
+              mainWindow.webContents.send('versionInfo', {jdk: `Renaming...`});
+            } catch (e) {}
+            fs.rename(path.join(ROELITE_DIR, 'jdk-11.0.22+7-jre'), path.join(ROELITE_DIR, 'jre'), err => {
+              if (err) {
+                log.error('Failed to rename JDK folder:', err);
+                reject(err);
+              } else {
+                log.info('Java 11 installed successfully');
+                resolve();
+              }
+            });
+          })
+          .catch(error => {
+            log.error('Failed to unzip JDK:', error);
+            reject(error);
+          });
+      });
     });
-    response.on('end', async () => {
-      writeStream.close();
-      try {
-        await extract(JDK_ZIP_PATH, {dir: ROELITE_DIR});
-        fs.rename(path.join(ROELITE_DIR, 'jdk-11.0.22+7-jre'), path.join(ROELITE_DIR, 'jre'), async err => {
-          if (err) {
-            log.error('Failed to rename JDK folder:', err);
-          }
-        });
-      } catch (error) {
-        log.error('Failed to unzip JDK:', error);
-      }
+    request.on('error', err => {
+      log.error('Download failed:', err);
+      reject(err);
     });
+    request.end();
   });
-  request.on('error', err => {
-    log.error('Download failed:', err);
-  });
-  request.end();
 }
 
 module.exports = {checkJava};

@@ -1,10 +1,11 @@
-const LAUNCHERS = ['OSRS', 'OSRSPS', 'OSNR', 'Vulcan', 'August'];
+const LAUNCHERS = ['OSRS', 'OSRSPS', 'OSNR', 'Vulcan'];
 const WALLPAPERS = Array.from({length: 11}, (_, index) => `${index + 1}.webp`);
 let UPDATE = false; // Default to false, updated based on version info
 let LATEST_VER = '1.0.0';
 let LOCAL_VER = '1.0.0';
+let JRE_INSTALLED = false;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   setBackgroundRandom();
   setInterval(setBackgroundRandom, (1 + Math.random() * 9) * 60_000); // Random time between 1 and 10 minutes
 });
@@ -26,17 +27,25 @@ function createButton(name) {
   const button = document.createElement('button');
   button.className = 'play';
   button.textContent = `Play ${name}`;
-  button.addEventListener('click', function() {
-    if (button.disabled) return;
+  let animationTimeout;
+  button.addEventListener('click', function () {
+    if (button.disabled || !JRE_INSTALLED) return;
+    // Reset any ongoing animation
+    clearTimeout(animationTimeout);
+    button.classList.remove('filling');
+    button.classList.add('reset');
+    // Force a reflow to ensure the reset class is applied immediately
+    button.offsetWidth;
+    button.classList.remove('reset');
     window.api.runJar(`${name.toLowerCase()}/${name}-Launcher.jar`);
     button.disabled = true;
-    button.style.backgroundColor = '#75b575'; // Clear background for fill effect
+    button.style.backgroundColor = '#213c24';
     button.classList.add('filling'); // Start the filling animation
-    setTimeout(() => {
+    animationTimeout = setTimeout(() => {
       button.disabled = false;
-      button.style.backgroundColor = '#4caf50'; // Reset to original green color
-      button.classList.remove('filling'); // Remove the filling animation
-    }, 10_000); // Set timeout to 10 seconds
+      button.style.backgroundColor = '#43d84d';
+      button.classList.remove('filling');
+    }, 10_000);
   });
   return button;
 }
@@ -45,9 +54,10 @@ function createUpdateButton() {
   const button = document.createElement('button');
   button.className = 'update';
   button.textContent = `Update Launcher: ${LOCAL_VER} -> ${LATEST_VER}`;
-  button.addEventListener('click', function() {
-    if (button.textContent.includes('Updating')) return;
+  button.addEventListener('click', function () {
+    if (button.disabled || !JRE_INSTALLED) return;
     window.api.downloadAndUpdate();
+    button.disabled = true;
     button.textContent = `Updating Launcher (0%)...`;
   });
   return button;
@@ -70,6 +80,9 @@ window.api.onVersionInfo(({jdk, local, remote, update}) => {
     UPDATE = update;
     LOCAL_VER = local;
     LATEST_VER = remote;
+  }
+  if (jdk === '11.0.22') {
+    JRE_INSTALLED = true;
   }
   setupLauncherButtons();
 });

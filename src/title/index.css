@@ -1,5 +1,6 @@
 html,
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #121212; /* Dark background for dark mode */
     color: #ffffff; /* Light text color for contrast */
     height: 100%;
@@ -24,27 +25,31 @@ body {
     flex-wrap: wrap; /* Allow the container to wrap elements */
     justify-content: space-evenly; /* Evenly space the elements */
     gap: 10px; /* Reduced space between button groups */
-    width: 90%; /* Increased width */
+    width: 95%; /* Increased width */
+    top: 25px;
+    position: fixed;
 }
 
 .button-container {
     display: flex;
     flex-direction: column; /* Stack logo and button vertically */
     align-items: center; /* Center-align the contents */
-    width: 20%; /* Smaller width to fit more items per row */
-    margin: 10px; /* Consistent margin for spacing */
+    width: 18%; /* Smaller width to fit more items per row */
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 3% 2.75%;
+    border-radius: 10px; /* Rounded corners */
 }
 
 .button-logo {
     pointer-events: none; /* Prevents dragging of images */
     width: auto; /* Maintain aspect ratio */
-    height: 80px; /* Adjusted height for more space */
+    height: 50px; /* Adjusted height for more space */
     margin-bottom: 10px; /* Reduced space between logo and button */
 }
 
 button {
     position: relative;
-    padding: 10px 20px; /* Adjust padding for aesthetics */
+    padding: 5px 10px; /* Adjust padding for aesthetics */
     white-space: nowrap; /* Keeps text on a single line */
     overflow: hidden; /* Prevents text from spilling out */
     text-overflow: ellipsis; /* Adds an ellipsis if text is too long */
@@ -52,19 +57,42 @@ button {
     cursor: pointer;
     font-size: 16px; /* Adjust font size as needed */
     border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
     transition: all 0.3s ease; /* Smooth transition for all changes */
-    z-index: 0; /* Ensure button text is above the progress bar */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    z-index:0;
 }
 
 /* Differentiate play and download button colors */
 button.play {
-    background-color: #4caf50; /* Green background */
+    background-color: #43d84d; /* Green background */
     color: #ffffff;
 }
 
 button.play:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #3cb141; /* Darker green on hover */
+}
+
+button.play::before {
+    border-radius: 5px;
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: #43d84d;
+    z-index: -1;
+    transition: width 10s linear;
+}
+
+button.play.filling::before {
+    width: 100%;
+}
+
+button.play.reset::before {
+    transition: none;
+    width: 0;
 }
 
 /* Update button with distinct style */
@@ -104,22 +132,4 @@ button,
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
-}
-
-button.play::before {
-    border-radius: 5px; /* Rounded corners */
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 100%;
-    background-color: #4caf50;
-    z-index: -1;
-    transition: width 10s linear;
-}
-
-button.play.filling::before {
-    width: 100%;
 }

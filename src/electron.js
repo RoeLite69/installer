@@ -11,40 +11,58 @@ const {runJar} = require('./js/runJar');
 const ROELITE_DIR = path.join(os.homedir(), '.roelite');
 let titleWindow = null;
 
+roeliteDir();
+
 if (handleSquirrelEvent()) {
   return;
 }
 
-function checkFiles() {
-  if (!fs.existsSync(ROELITE_DIR)) {
-    fs.mkdir(ROELITE_DIR, () => {});
-    log.info('Created roelite dir');
+async function createDir(dir, extra) {
+  if (!fs.existsSync(dir)) {
+    if (extra) {
+      await fs.mkdir(path.join(dir, extra), () => {});
+      log.info(`Created ${dir}/${extra} dir`);
+    } else {
+      fs.mkdir(dir, () => {});
+      log.info(`Created ${dir} dir`);
+    }
   }
 }
 
+async function roeliteDir() {
+  await createDir(ROELITE_DIR);
+  await createDir(ROELITE_DIR, 'logs');
+  await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
+}
+
 app.whenReady().then(() => {
+  log.transports.file.resolvePathFn = () => path.join(os.homedir(), '.roelite', 'logs', 'electron.log');
   loadChecksums();
   setInterval(() => loadChecksums(), 1_800_000); //every 30 minutes
-  log.transports.file.resolvePathFn = () => path.join(os.homedir(), '.roelite', 'logs', 'electron.log');
-  checkFiles();
   // Create the browser window.
   titleWindow = new BrowserWindow({
     icon: path.join(__dirname, './img/roelite.ico'),
-    width: 800,
-    height: 600,
+    width: 600,
+    height: 400,
     webPreferences: {
       preload: path.join(__dirname, './preload.js')
     }
   });
+  titleWindow.setFullScreenable(false);
   titleWindow.setMenuBarVisibility(false);
   titleWindow.setFullScreenable(false);
+  titleWindow.setMaximizable(false);
   titleWindow.setTitle('RoeLite Launcher');
-  titleWindow.setMinimumSize(800, 600);
+  titleWindow.setMinimumSize(600, 400);
+  titleWindow.setMaximumSize(600, 400);
   titleWindow.loadFile(path.join(__dirname, './title/index.html')).then(r => {
-    checkForUpdates(titleWindow).then(r => {
-      log.info('Checked for updates.');
-      checkJava(titleWindow).then(() => {
-        log.info('Checked Java Version.');
+    checkJava(titleWindow).then(() => {
+      checkForUpdates(titleWindow).then(r => {
+        setInterval(() => {
+          checkForUpdates(titleWindow).then(() => {
+            log.info('Periodically checked for updates.');
+          });
+        }, 1_800_000); //every 30 minutes
       });
     });
   });

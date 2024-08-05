@@ -1,7 +1,7 @@
 const {contextBridge, ipcRenderer} = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  runJar: () => ipcRenderer.send('runJar'),
+  runJar: filePath => ipcRenderer.send('runJar', filePath),
   downloadAndUpdate: () => ipcRenderer.send('downloadAndUpdate'),
   // New methods for Java 11 check and installation
   checkJava11: () => ipcRenderer.send('checkJava11'),

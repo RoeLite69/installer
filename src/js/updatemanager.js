@@ -39,7 +39,7 @@ async function getLatestReleaseInfo() {
       return map;
     }
     if (!release.name || !release.assets) {
-      console.error('Failed finding release name/assets, response:', release.status);
+      console.error('Failed finding release name or assets, response:', release);
       return map;
     }
     const version = release.name;
@@ -117,43 +117,47 @@ function dlUrl(window, url, remoteVersion) {
     method: 'GET',
     headers: {'User-Agent': 'RoeLiteInstaller'}
   };
-  https.get(url, requestOptions, response => {
-    if (response.statusCode === 200) {
-      // Only handle the response if it's a direct download (status code 200)
-      const fileStream = fs.createWriteStream(updateExePath);
-      let downloadedBytes = 0;
-      const totalBytes = parseInt(response.headers['content-length'], 10);
-      response.on('data', chunk => {
-        downloadedBytes += chunk.length;
-        const progress = Math.floor((downloadedBytes / totalBytes) * 100);
-        window.webContents.send('updateProgress', {progress});
-      });
-      response.pipe(fileStream);
-      fileStream.on('finish', () => {
-        fileStream.close(() => {
-          log.info('Update downloaded, starting the update process...');
-          updateLocalVersion(remoteVersion);
-          exec(updateExePath, error => {
-            if (error) {
-              log.error(`Error executing update: ${error}`);
-            }
-            app.quit(); // Quit the app to allow the installer to run
+  https
+    .get(url, requestOptions, response => {
+      if (response.statusCode === 200) {
+        // Only handle the response if it's a direct download (status code 200)
+        const fileStream = fs.createWriteStream(updateExePath);
+        let downloadedBytes = 0;
+        const totalBytes = parseInt(response.headers['content-length'], 10);
+        response.on('data', chunk => {
+          downloadedBytes += chunk.length;
+          const progress = Math.floor((downloadedBytes / totalBytes) * 100);
+          try {
+            window.webContents.send('updateProgress', {progress});
+          } catch (e) {}
+        });
+        response.pipe(fileStream);
+        fileStream.on('finish', () => {
+          fileStream.close(() => {
+            log.info('Update downloaded, starting the update process...');
+            exec(updateExePath, error => {
+              if (error) {
+                log.error(`Error executing update: ${error}`);
+              }
+              updateLocalVersion(remoteVersion);
+              app.quit(); // Quit the app to allow the installer to run
+            });
           });
         });
-      });
-      fileStream.on('error', error => {
-        log.error('File Stream Error:', error);
-        fileStream.close();
-      });
-    } else if (response.statusCode > 300 && response.statusCode < 399 && response.headers.location) {
-      // Handle redirects
-      dlUrl(window, response.headers.location, remoteVersion);
-    } else {
-      log.error('Download request failed with status:', response.statusCode);
-    }
-  }).on('error', err => {
-    log.error('HTTPS Request Error:', err);
-  });
+        fileStream.on('error', error => {
+          log.error('File Stream Error:', error);
+          fileStream.close();
+        });
+      } else if (response.statusCode > 300 && response.statusCode < 399 && response.headers.location) {
+        // Handle redirects
+        dlUrl(window, response.headers.location, remoteVersion);
+      } else {
+        log.error('Download request failed with status:', response.statusCode);
+      }
+    })
+    .on('error', err => {
+      log.error('HTTPS Request Error:', err);
+    });
 }
 
 module.exports = {checkForUpdates, downloadAndUpdate};
