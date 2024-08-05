@@ -5,7 +5,6 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const os = require('os');
 // Define paths related to the app and its updates
-const appExecutablePath = path.basename(process.execPath);
 const updateExecutable = path.resolve(path.join(path.dirname(process.execPath), '..', 'Update.exe'));
 
 // Define paths for RoeLite data directories
@@ -34,26 +33,27 @@ function removeDirectories(directories) {
 }
 
 function handleSquirrelEvent() {
-  if (process.argv.length === 1 || os.platform() === 'darwin') {
-    return false;
-  }
-  const squirrelEvent = process.argv[1];
-  const isSquirrelEvent = squirrelEvent.startsWith('--squirrel');
-  if (!isSquirrelEvent) return false;
-  switch (squirrelEvent) {
-    case '--squirrel-install':
-    case '--squirrel-updated':
-      executeUpdate(['--createShortcut', appExecutablePath, '--shortcut-locations', 'Desktop,StartMenu']);
-      break;
-    case '--squirrel-uninstall':
-      executeUpdate(['--removeShortcut', appExecutablePath, '--shortcut-locations', 'Desktop,StartMenu']);
+  if (process.platform === 'win32') {
+    let cmd = process.argv[1];
+    let target = path.basename(process.execPath);
+    const quit = () => setTimeout(electron.app.quit, 1000);
+    if (cmd === '--squirrel-install' || cmd === '--squirrel-updated') {
+      executeUpdate(['--createShortcut', target, '--shortcut-locations', 'Desktop,StartMenu']);
+      quit();
+      return true;
+    }
+    if (cmd === '--squirrel-uninstall') {
+      executeUpdate(['--removeShortcut', target, '--shortcut-locations', 'Desktop,StartMenu']);
       removeDirectories([startMenuShortcut, localDataDir, roamingDataDir, roeliteDir, osrsCM]);
-      break;
-    case '--squirrel-obsolete':
-      break;
+      quit();
+      return true;
+    }
+    if (cmd === '--squirrel-obsolete') {
+      quit();
+      return true;
+    }
   }
-  setTimeout(app.quit, 1000);
-  return true;
+  return false;
 }
 
 module.exports = {handleSquirrelEvent};

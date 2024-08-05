@@ -12,7 +12,6 @@ const ROELITE_DIR = path.join(os.homedir(), '.roelite');
 let titleWindow = null;
 
 roeliteDir();
-
 if (handleSquirrelEvent()) {
   return;
 }
@@ -29,10 +28,10 @@ async function createDir(dir, extra) {
   }
 }
 
-async function roeliteDir() {
-  await createDir(ROELITE_DIR);
-  await createDir(ROELITE_DIR, 'logs');
-  await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
+function roeliteDir() {
+  createDir(ROELITE_DIR).then(() => {});
+  createDir(ROELITE_DIR, 'logs').then(() => {});
+  fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
 }
 
 app.whenReady().then(() => {
