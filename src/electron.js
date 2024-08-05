@@ -32,10 +32,19 @@ function roeliteDir() {
   createDir(ROELITE_DIR).then(() => {});
   createDir(ROELITE_DIR, 'logs').then(() => {});
   fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
+  const logFilePath = path.join(ROELITE_DIR, 'logs', 'electron.log');
+  fs.stat(logFilePath, (err, stats) => {
+    if (err) {
+      return;
+    }
+    if (stats.size > 1048576) { // 1MB
+      fs.unlink(logFilePath, () => {});
+    }
+  });
 }
 
 app.whenReady().then(() => {
-  log.transports.file.resolvePathFn = () => path.join(os.homedir(), '.roelite', 'logs', 'electron.log');
+  log.transports.file.resolvePathFn = () => path.join(ROELITE_DIR, 'logs', 'electron.log');
   loadChecksums();
   setInterval(() => loadChecksums(), 1_800_000); //every 30 minutes
   // Create the browser window.
