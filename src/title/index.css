@@ -43,13 +43,13 @@ body {
 .button-logo {
     pointer-events: none; /* Prevents dragging of images */
     width: auto; /* Maintain aspect ratio */
-    height: 50px; /* Adjusted height for more space */
+    height: 15vh; /* Adjusted height for more space */
     margin-bottom: 10px; /* Reduced space between logo and button */
 }
 
 button {
     position: relative;
-    padding: 5px 10px; /* Adjust padding for aesthetics */
+    padding: 4% 10%; /* Adjust padding for aesthetics */
     white-space: nowrap; /* Keeps text on a single line */
     overflow: hidden; /* Prevents text from spilling out */
     text-overflow: ellipsis; /* Adds an ellipsis if text is too long */

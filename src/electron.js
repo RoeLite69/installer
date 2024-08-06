@@ -58,11 +58,8 @@ app.whenReady().then(() => {
   });
   titleWindow.setFullScreenable(false);
   titleWindow.setMenuBarVisibility(false);
-  titleWindow.setFullScreenable(false);
-  titleWindow.setMaximizable(false);
   titleWindow.setTitle('RoeLite Launcher');
   titleWindow.setMinimumSize(600, 400);
-  titleWindow.setMaximumSize(600, 400);
   titleWindow.loadFile(path.join(__dirname, './title/index.html')).then(r => {
     checkJava(titleWindow).then(() => {
       checkForUpdates(titleWindow).then(r => {
