@@ -34,23 +34,23 @@ body {
     display: flex;
     flex-direction: column; /* Stack logo and button vertically */
     align-items: center; /* Center-align the contents */
-    width: 19%; /* Smaller width to fit more items per row */
+    width: 18%; /* Smaller width to fit more items per row */
     background-color: rgba(0, 0, 0, 0.5);
-    padding: 2% 2%;
+    padding: 3% 2.75%;
     border-radius: 10px; /* Rounded corners */
-    margin-bottom: 10px;
+    margin-bottom: 2vh;
 }
 
 .button-logo {
     pointer-events: none; /* Prevents dragging of images */
     width: auto; /* Maintain aspect ratio */
-    height: 15vh; /* Adjusted height for more space */
-    margin-bottom: 10px; /* Reduced space between logo and button */
+    height: 14vh; /* Adjusted height for more space */
+    margin-bottom: 5px; /* Reduced space between logo and button */
 }
 
 button {
     position: relative;
-    padding: 2vh 2vw; /* Adjust padding for aesthetics */
+    padding: 2vh 1.5vw; /* Adjust padding for aesthetics */
     white-space: nowrap; /* Keeps text on a single line */
     overflow: hidden; /* Prevents text from spilling out */
     text-overflow: ellipsis; /* Adds an ellipsis if text is too long */
