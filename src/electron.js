@@ -37,7 +37,8 @@ function roeliteDir() {
     if (err) {
       return;
     }
-    if (stats.size > 1048576) { // 1MB
+    if (stats.size > 1048576) {
+      // 1MB
       fs.unlink(logFilePath, () => {});
     }
   });

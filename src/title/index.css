@@ -34,10 +34,11 @@ body {
     display: flex;
     flex-direction: column; /* Stack logo and button vertically */
     align-items: center; /* Center-align the contents */
-    width: 18%; /* Smaller width to fit more items per row */
+    width: 19%; /* Smaller width to fit more items per row */
     background-color: rgba(0, 0, 0, 0.5);
-    padding: 3% 2.75%;
+    padding: 2% 2%;
     border-radius: 10px; /* Rounded corners */
+    margin-bottom: 10px;
 }
 
 .button-logo {
@@ -49,7 +50,7 @@ body {
 
 button {
     position: relative;
-    padding: 4% 10%; /* Adjust padding for aesthetics */
+    padding: 2vh 2vw; /* Adjust padding for aesthetics */
     white-space: nowrap; /* Keeps text on a single line */
     overflow: hidden; /* Prevents text from spilling out */
     text-overflow: ellipsis; /* Adds an ellipsis if text is too long */
@@ -59,17 +60,17 @@ button {
     border-radius: 5px; /* Rounded corners */
     transition: all 0.3s ease; /* Smooth transition for all changes */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    z-index:0;
+    z-index: 0;
 }
 
 /* Differentiate play and download button colors */
 button.play {
-    background-color: #43d84d; /* Green background */
+    background-color: #228f29; /* Green background */
     color: #ffffff;
 }
 
 button.play:hover {
-    background-color: #3cb141; /* Darker green on hover */
+    background-color: #31c33a; /* Darker green on hover */
 }
 
 button.play::before {
@@ -81,7 +82,7 @@ button.play::before {
     left: 0;
     width: 0;
     height: 100%;
-    background-color: #43d84d;
+    background-color: #228f29;
     z-index: -1;
     transition: width 10s linear;
 }
@@ -98,7 +99,7 @@ button.play.reset::before {
 /* Update button with distinct style */
 button.update {
     position: fixed;
-    bottom: 25px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%); /* Center the button horizontally */
     background-color: #f44336; /* Red background for attention */

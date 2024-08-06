@@ -1,4 +1,4 @@
-const LAUNCHERS = ['OSRS', 'OSRSPS', 'OSNR', 'Vulcan'];
+const LAUNCHERS = ['OSRS', 'OSRSPS', 'OSNR', 'Vulcan', 'August'];
 const WALLPAPERS = Array.from({length: 11}, (_, index) => `${index + 1}.webp`);
 let UPDATE = false; // Default to false, updated based on version info
 let LATEST_VER = '1.0.0';
@@ -30,6 +30,7 @@ function createButton(name) {
   let animationTimeout;
   button.addEventListener('click', function () {
     if (button.disabled || !JRE_INSTALLED) return;
+    window.api.runJar(`${name.toLowerCase()}/${name}-Launcher.jar`);
     // Reset any ongoing animation
     clearTimeout(animationTimeout);
     button.classList.remove('filling');
@@ -37,13 +38,12 @@ function createButton(name) {
     // Force a reflow to ensure the reset class is applied immediately
     button.offsetWidth;
     button.classList.remove('reset');
-    window.api.runJar(`${name.toLowerCase()}/${name}-Launcher.jar`);
     button.disabled = true;
     button.style.backgroundColor = '#213c24';
     button.classList.add('filling'); // Start the filling animation
     animationTimeout = setTimeout(() => {
       button.disabled = false;
-      button.style.backgroundColor = '#43d84d';
+      button.style.backgroundColor = '#228f29';
       button.classList.remove('filling');
     }, 10_000);
   });
