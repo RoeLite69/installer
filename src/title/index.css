@@ -26,7 +26,7 @@ body {
     justify-content: space-evenly; /* Evenly space the elements */
     gap: 10px; /* Reduced space between button groups */
     width: 95%; /* Increased width */
-    top: 25px;
+    top: 15px;
     position: fixed;
 }
 
@@ -38,19 +38,19 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     padding: 3% 2.75%;
     border-radius: 10px; /* Rounded corners */
-    margin-bottom: 2vh;
+    margin-bottom: 1vh;
 }
 
 .button-logo {
     pointer-events: none; /* Prevents dragging of images */
     width: auto; /* Maintain aspect ratio */
     height: 14vh; /* Adjusted height for more space */
-    margin-bottom: 5px; /* Reduced space between logo and button */
+    margin-bottom: 10px; /* Reduced space between logo and button */
 }
 
 button {
     position: relative;
-    padding: 2vh 1.5vw; /* Adjust padding for aesthetics */
+    padding: 2.5vh 2vw; /* Adjust padding for aesthetics */
     white-space: nowrap; /* Keeps text on a single line */
     overflow: hidden; /* Prevents text from spilling out */
     text-overflow: ellipsis; /* Adds an ellipsis if text is too long */
@@ -98,8 +98,9 @@ button.play.reset::before {
 
 /* Update button with distinct style */
 button.update {
+    padding: 1vh 0; /* Adjust padding for aesthetics */
     position: fixed;
-    bottom: 30px;
+    bottom: 25px;
     left: 50%;
     transform: translateX(-50%); /* Center the button horizontally */
     background-color: #f44336; /* Red background for attention */

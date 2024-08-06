@@ -133,7 +133,7 @@ function setupLauncherButtons() {
     container.appendChild(buttonContainer); // Append the button container to the main container
   });
   // Append the update button if required
-  if (UPDATE) {
+  if (true) {
     container.appendChild(createUpdateButton());
   }
 }
