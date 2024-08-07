@@ -1,3 +1,3 @@
-# roelite-launcher
+# RoeLite Installer
 
-Electron Application Code for the RoeLite Launcher
+Electron.js application code for the RoeLite Installer.
