@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const childProcess = require('child_process');
 const os = require('os');
+const { exec } = require('child_process');
 // Define paths related to the app and its updates
 const updateExecutable = path.resolve(path.join(path.dirname(process.execPath), '..', 'Update.exe'));
 
