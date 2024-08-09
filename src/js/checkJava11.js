@@ -85,9 +85,9 @@ async function installJava11(mainWindow) {
         } catch (e) {}
         writeStream.end();
         if (os.platform() === 'win32') {
-          extractZip(mainWindow, ZIP_PATH, resolve, reject);
+          extractZip(ZIP_PATH, resolve, reject);
         } else {
-          extractTarGz(mainWindow, ZIP_PATH, resolve, reject);
+          extractTarGz(ZIP_PATH, resolve, reject);
         }
       });
     });
@@ -101,11 +101,12 @@ async function installJava11(mainWindow) {
 
 async function extractTarGz(filePath, resolve, reject) {
   try {
-    await tar.x({
-      file: filePath,
-      C: path.join(ROELITE_DIR)
-    });
-    resolve();
+    tar
+      .x({
+        file: filePath,
+        C: path.join(ROELITE_DIR)
+      })
+      .then(() => resolve());
   } catch (err) {
     try {
       await fs.rmdir(JRE_PATH, {recursive: true}, () => {});
