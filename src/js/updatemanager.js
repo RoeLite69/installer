@@ -60,8 +60,10 @@ async function getLatestReleaseInfo() {
 // Check for updates and handle the update process
 async function checkForUpdates(mainWindow) {
   try {
-    await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
-    await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.dmg'), () => {});
+    await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {
+    });
+    await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.dmg'), () => {
+    });
     const {version, url} = await getLatestReleaseInfo();
     if (!version || !url) {
       return;
@@ -145,6 +147,9 @@ function dlUrl(window, url, remoteVersion) {
           log.error('File Stream Error:', error);
           fileStream.close();
         });
+      } else if (response.statusCode > 300 && response.statusCode < 399 && response.headers.location) {
+        // Handle redirects
+        dlUrl(window, response.headers.location, remoteVersion);
       } else {
         log.error('Download request failed with status:', response.statusCode);
       }
