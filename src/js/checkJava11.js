@@ -99,17 +99,17 @@ async function installJava11(mainWindow) {
   });
 }
 
-function extractTarGz(filePath, resolve, reject) {
+async function extractTarGz(filePath, resolve, reject) {
   try {
-    tar.x({
+    await tar.x({
       file: filePath,
       C: path.join(ROELITE_DIR)
     });
     resolve();
   } catch (err) {
     try {
-      fs.rmdir(JRE_PATH, {recursive: true}, () => {});
-      fs.unlink(filePath, () => {});
+      await fs.rmdir(JRE_PATH, {recursive: true}, () => {});
+      await fs.unlink(filePath, () => {});
     } catch (err) {}
     reject(err);
   }
