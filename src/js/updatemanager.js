@@ -121,6 +121,16 @@ function dlUrl(window, url, remoteVersion) {
     .get(url, requestOptions, response => {
       if (response.statusCode === 200) {
         const fileStream = fs.createWriteStream(installerPath);
+        let downloadedBytes = 0;
+        const totalBytes = parseInt(response.headers['content-length'], 10);
+        response.on('data', chunk => {
+          downloadedBytes += chunk.length;
+          const progress = Math.floor((downloadedBytes / totalBytes) * 100);
+          try {
+            window.webContents.send('updateProgress', {progress});
+          } catch (e) {
+          }
+        });
         response.pipe(fileStream);
         fileStream.on('finish', () => {
           fileStream.close(() => {
