@@ -26,9 +26,10 @@ module.exports = {
       name: '@electron-forge/maker-dmg',
       config: {
         name: 'RoeLite',
+        title: 'RoeLite',
         icon: './src/img/RoeLite.icns',
-        overwrite: true,
         background: './src/img/RoeLite.png',
+        window: { width: 500, height: 300 },
         format: 'ULFO'
       }
     }

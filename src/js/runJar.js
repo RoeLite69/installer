@@ -20,7 +20,8 @@ async function runJar(filePath) {
       return;
     }
     const jarName = path.basename(filePath);
-    const javaPath = path.join(ROELITE_DIR, 'jre', 'bin', 'java.exe');
+    const javaExecutable = os.platform() === 'win32' ? 'java.exe' : 'java';
+    const javaPath = path.join(ROELITE_DIR, 'jre', 'bin', javaExecutable);
     exec(`"${javaPath}" -jar "${jarPath}"`, (error, stdout) => {
       if (error) {
         log.error('JAR launch failed:', error);

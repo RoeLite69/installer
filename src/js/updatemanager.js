@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const {app} = require('electron');
+const { app } = require('electron');
 const log = require('electron-log');
 const semver = require('semver');
 const https = require('https');
@@ -43,12 +43,13 @@ async function getLatestReleaseInfo() {
       return map;
     }
     const version = release.name;
-    const asset = release.assets.find(asset => asset.name === 'RoeLiteInstaller.exe');
+    const assetName = os.platform() === 'win32' ? 'RoeLiteInstaller.exe' : 'RoeLiteInstaller.dmg';
+    const asset = release.assets.find(asset => asset.name === assetName);
     if (asset && asset.browser_download_url) {
       map.version = version;
       map.url = asset.browser_download_url;
     } else {
-      console.error('Failed to find RoeLiteInstaller.exe asset in release.');
+      console.error(`Failed to find ${assetName} asset in release.`);
     }
   } catch (error) {
     log.error('Error getting latest release info:', error);
@@ -59,7 +60,7 @@ async function getLatestReleaseInfo() {
 // Check for updates and handle the update process
 async function checkForUpdates(mainWindow) {
   try {
-    const {version, url} = await getLatestReleaseInfo();
+    const { version, url } = await getLatestReleaseInfo();
     if (!version || !url) {
       return;
     }
@@ -96,7 +97,7 @@ function sendVersionInfo(mainWindow, local, remote, update) {
 }
 
 async function downloadAndUpdate(window) {
-  const {version, url} = await getLatestReleaseInfo();
+  const { version, url } = await getLatestReleaseInfo();
   if (!version || !url) {
     return;
   }
@@ -105,8 +106,9 @@ async function downloadAndUpdate(window) {
 }
 
 function dlUrl(window, url, remoteVersion) {
+  const installerFileName = os.platform() === 'win32' ? 'RoeLiteInstaller.exe' : 'RoeLiteInstaller.dmg';
+  const installerPath = path.join(ROELITE_DIR, installerFileName);
   log.info('Downloading launcher from:', url);
-  const updateExePath = path.join(ROELITE_DIR, 'RoeLiteInstaller.exe');
   const requestOptions = {
     method: 'GET',
     headers: {'User-Agent': 'RoeLiteInstaller'}
@@ -114,37 +116,33 @@ function dlUrl(window, url, remoteVersion) {
   https
     .get(url, requestOptions, response => {
       if (response.statusCode === 200) {
-        // Only handle the response if it's a direct download (status code 200)
-        const fileStream = fs.createWriteStream(updateExePath);
-        let downloadedBytes = 0;
-        const totalBytes = parseInt(response.headers['content-length'], 10);
-        response.on('data', chunk => {
-          downloadedBytes += chunk.length;
-          const progress = Math.floor((downloadedBytes / totalBytes) * 100);
-          try {
-            window.webContents.send('updateProgress', {progress});
-          } catch (e) {}
-        });
+        const fileStream = fs.createWriteStream(installerPath);
         response.pipe(fileStream);
         fileStream.on('finish', () => {
           fileStream.close(() => {
             log.info('Update downloaded, starting the update process...');
             fs.writeFileSync(LOCAL_VER_PATH, remoteVersion);
-            exec(updateExePath, error => {
-              if (error) {
-                log.error(`Error executing update: ${error}`);
-              }
-              app.quit(); // Quit the app to allow the installer to run
-            });
+            if (os.platform() === 'win32') {
+              exec(installerPath, error => {
+                if (error) log.error(`Error executing update: ${error}`);
+                app.quit(); // Quit the app to allow the installer to run
+              });
+            } else {
+              exec(`hdiutil attach "${installerPath}"`, error => {
+                if (error) {
+                  log.error(`Error mounting DMG: ${error}`);
+                } else {
+                  log.info(`DMG mounted and ready to install`);
+                  // Additional code could handle DMG installation steps if necessary
+                }
+              });
+            }
           });
         });
         fileStream.on('error', error => {
           log.error('File Stream Error:', error);
           fileStream.close();
         });
-      } else if (response.statusCode > 300 && response.statusCode < 399 && response.headers.location) {
-        // Handle redirects
-        dlUrl(window, response.headers.location, remoteVersion);
       } else {
         log.error('Download request failed with status:', response.statusCode);
       }
@@ -154,4 +152,4 @@ function dlUrl(window, url, remoteVersion) {
     });
 }
 
-module.exports = {checkForUpdates, downloadAndUpdate};
+module.exports = { checkForUpdates, downloadAndUpdate };
