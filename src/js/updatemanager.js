@@ -72,7 +72,7 @@ async function checkForUpdates(mainWindow) {
     }
     log.info('Remote version: ' + version);
     if (!fs.existsSync(LOCAL_VER_PATH)) {
-      fs.writeFileSync(LOCAL_VER_PATH, version);
+      fs.writeFileSync(LOCAL_VER_PATH, version, 'utf-8');
       log.info('Local version file not found, reset to remote: ', version);
       sendVersionInfo(mainWindow, version, version, false);
     } else {
@@ -135,7 +135,7 @@ function dlUrl(window, url, remoteVersion) {
                   log.error(`Error mounting DMG: ${error}`);
                 } else {
                   log.info(`DMG mounted and ready to install`);
-                  // Additional code could handle DMG installation steps if necessary
+                  app.quit(); // Quit the app to allow the installer to run
                 }
               });
             }
