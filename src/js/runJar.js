@@ -7,6 +7,11 @@ const https = require('https');
 const {getChecksum, getFileChecksum} = require('./checksums');
 
 const ROELITE_DIR = path.join(os.homedir(), '.roelite');
+const JRE_PATH = path.join(ROELITE_DIR, 'jdk-11.0.22+7-jre');
+let JAVA_PATH =
+  os.platform() === 'win32'
+    ? path.join(JRE_PATH, 'bin', 'java.exe')
+    : path.join(JRE_PATH, 'Contents', 'Home', 'bin', 'java');
 
 async function runJar(filePath) {
   if (!filePath) {
@@ -20,9 +25,7 @@ async function runJar(filePath) {
       return;
     }
     const jarName = path.basename(filePath);
-    const javaExecutable = os.platform() === 'win32' ? 'java.exe' : 'java';
-    const javaPath = path.join(ROELITE_DIR, 'jre', 'bin', javaExecutable);
-    exec(`"${javaPath}" -jar "${jarPath}"`, (error, stdout) => {
+    exec(`"${JAVA_PATH}" -jar "${jarPath}"`, (error, stdout) => {
       if (error) {
         log.error('JAR launch failed:', error);
         log.info('Deleting the invalid JAR file.');
@@ -93,7 +96,9 @@ async function downloadJarIfChanged(filePath) {
       } else {
         console.error(`Failed to download ${jarName}: Server responded with status code ${response.statusCode}`);
         fileStream.end(() => {
-          fs.unlink(jarPath, () => reject(new Error(`Failed to download ${jarName}: Server responded with status code ${response.statusCode}`)));
+          fs.unlink(jarPath, () =>
+            reject(new Error(`Failed to download ${jarName}: Server responded with status code ${response.statusCode}`))
+          );
         });
       }
     });

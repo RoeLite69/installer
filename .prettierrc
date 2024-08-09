@@ -5,6 +5,6 @@
   "trailingComma": "none",
   "bracketSpacing": false,
   "endOfLine": "crlf",
-  "printWidth": 150,
+  "printWidth": 120,
   "arrowParens": "avoid"
 }

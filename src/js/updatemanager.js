@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { app } = require('electron');
+const {app} = require('electron');
 const log = require('electron-log');
 const semver = require('semver');
 const https = require('https');
@@ -60,7 +60,9 @@ async function getLatestReleaseInfo() {
 // Check for updates and handle the update process
 async function checkForUpdates(mainWindow) {
   try {
-    const { version, url } = await getLatestReleaseInfo();
+    await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
+    await fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.dmg'), () => {});
+    const {version, url} = await getLatestReleaseInfo();
     if (!version || !url) {
       return;
     }
@@ -97,7 +99,7 @@ function sendVersionInfo(mainWindow, local, remote, update) {
 }
 
 async function downloadAndUpdate(window) {
-  const { version, url } = await getLatestReleaseInfo();
+  const {version, url} = await getLatestReleaseInfo();
   if (!version || !url) {
     return;
   }
@@ -152,4 +154,4 @@ function dlUrl(window, url, remoteVersion) {
     });
 }
 
-module.exports = { checkForUpdates, downloadAndUpdate };
+module.exports = {checkForUpdates, downloadAndUpdate};

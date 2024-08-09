@@ -31,8 +31,6 @@ async function createDir(dir, extra) {
 function roeliteDir() {
   createDir(ROELITE_DIR).then(() => {});
   createDir(ROELITE_DIR, 'logs').then(() => {});
-  fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.exe'), () => {});
-  fs.unlink(path.join(ROELITE_DIR, 'RoeLiteInstaller.dmg'), () => {});
   const logFilePath = path.join(ROELITE_DIR, 'logs', 'electron.log');
   fs.stat(logFilePath, (err, stats) => {
     if (err) {
