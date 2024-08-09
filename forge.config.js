@@ -29,7 +29,8 @@ module.exports = {
         title: 'RoeLite',
         icon: './src/img/RoeLite.icns',
         window: {width: 250, height: 150},
-        format: 'ULFO'
+        format: 'ULFO',
+        overwrite: true
       }
     }
   ]
