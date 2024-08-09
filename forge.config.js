@@ -25,7 +25,7 @@ module.exports = {
     {
       name: '@electron-forge/maker-dmg',
       config: {
-        name: 'RoeLite',
+        name: 'RoeLiteInstaller',
         title: 'RoeLite',
         icon: './src/img/RoeLite.icns',
         window: {width: 250, height: 150},
