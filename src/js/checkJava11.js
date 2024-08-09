@@ -105,13 +105,22 @@ function extractZip(mainWindow, filePath, resolve, reject) {
 }
 
 function installPkg(mainWindow, filePath, resolve, reject) {
+  const targetDir = path.join(ROELITE_DIR, 'jre');
   mainWindow.webContents.send('versionInfo', { jdk: `Installing...` });
-  exec(`installer -pkg "${filePath}" -target /`, (error) => {
+  // Prepare the directory for installation
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+  // Extract the .pkg directly into the target directory
+  const command = `installer -pkg "${filePath}" -target "${targetDir}"`;
+  exec(command, (error, stdout, stderr) => {
     if (error) {
-      log.error('Failed to install JDK package:', error);
+      log.error('Failed to install JDK package:', stderr);
+      mainWindow.webContents.send('versionInfo', { jdk: `Installation Error: ${stderr}` });
       reject(error);
     } else {
-      log.info('Java 11 installed successfully');
+      log.info('Java 11 installed successfully:', stdout);
+      mainWindow.webContents.send('versionInfo', { jdk: 'Installation Successful!' });
       resolve();
     }
   });

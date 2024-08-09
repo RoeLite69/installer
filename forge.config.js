@@ -28,8 +28,7 @@ module.exports = {
         name: 'RoeLite',
         title: 'RoeLite',
         icon: './src/img/RoeLite.icns',
-        background: './src/img/RoeLite.png',
-        window: { width: 500, height: 300 },
+        window: { width: 250, height: 150 },
         format: 'ULFO'
       }
     }
