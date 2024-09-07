@@ -10,43 +10,66 @@
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32",
     "make:mac": "electron-forge make --platform darwin",
-    "make:linux": "electron-forge make --platform linux",
-    "publish": "electron-forge publish",
-    "publish:win": "electron-forge publish --platform win32",
-    "publish:mac": "electron-forge publish --platform darwin",
-    "publish:linux": "electron-forge publish --platform linux",
+    "make:linux": "electron-builder --linux appimage",
     "prettier": "prettier --write \"**/*.js\"",
     "lint": "eslint src"
   },
   "config": {
     "forge": "./forge.config.js"
   },
+  "build": {
+    "appId": "dev.roelite.app",
+    "productName": "RoeLite",
+    "directories": {
+      "output": "out"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "./src/img/RoeLite.png",
+      "category": "Game",
+      "executableName": "roelite",
+      "synopsis": "Third party client for Oldschool Runescape and RSPS.",
+      "description": "RoeLite is a third party client for Oldschool Runescape and RSPS.",
+      "desktop": {
+        "Name": "RoeLite",
+        "Comment": "Third party client for Oldschool Runescape and RSPS.",
+        "Categories": "Game;",
+        "Terminal": "false",
+        "Type": "Application"
+      }
+    },
+    "appImage": {
+      "systemIntegration": "ask"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ]
+  },
   "keywords": [],
   "author": {
     "name": "Roe",
-    "email": "88600811+roe69@users.noreply.github.com"
+    "email": "admin@roelite.net"
   },
-  "license": "MIT",
+  "dependencies": {
+    "electron-log": "^5.2.0",
+    "electron-store": "^10.0.0"
+  },
   "devDependencies": {
-    "@electron-forge/cli": "^7.2.0",
-    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/cli": "^7.4.0",
     "@electron-forge/maker-dmg": "^7.4.0",
-    "@electron-forge/maker-rpm": "^7.2.0",
-    "@electron-forge/maker-squirrel": "^7.2.0",
-    "@electron-forge/maker-zip": "^7.2.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
-    "@electron-forge/publisher-github": "^7.2.0",
-    "electron": "^30.0.0-beta.5",
-    "electron-log": "^5.1.1",
-    "electron-squirrel-startup": "^1.0.0",
-    "eslint": "^8.56.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "electron": "^32.0.2",
+    "electron-builder": "^25.0.5",
+    "electron-squirrel-startup": "^1.0.1",
+    "eslint": "^9.10.0",
     "eslint-config-prettier": "^9.1.0",
     "extract-zip": "^2.0.1",
     "prettier": "^3.3.3",
-    "semver": "^7.6.0",
+    "semver": "^7.6.3",
     "tar": "^7.4.3"
-  },
-  "dependencies": {
-    "electron-store": "^10.0.0"
   }
 }

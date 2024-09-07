@@ -37,85 +37,11 @@ module.exports = {
 				overwrite: true,
 			},
 		},
-		{
-			name: '@electron-forge/maker-zip',
-			platforms: ['darwin'],
-		},
-		{
-			name: '@electron-forge/maker-deb',
-			config: {
-				options: {
-					maintainer: 'Roe',
-					homepage: 'https://roelite.net',
-					icon: './src/img/RoeLite.png',
-					categories: ['Game'],
-					description: 'Third party client for Oldschool Runescape and RSPS.',
-					productName: 'RoeLite',
-					genericName: 'RoeLite Launcher',
-					section: 'games',
-					priority: 'optional',
-				},
-			},
-		},
-		{
-			name: '@electron-forge/maker-rpm',
-			config: {
-				options: {
-					maintainer: 'Roe',
-					homepage: 'https://roelite.net',
-					icon: './src/img/RoeLite.png',
-					categories: ['Game'],
-					description: 'Third party client for Oldschool Runescape and RSPS.',
-					productName: 'RoeLite',
-					genericName: 'RoeLite Launcher',
-					group: 'Applications/Games',
-					license: 'MIT',
-				},
-			},
-		},
-		{
-			name: '@electron-forge/maker-appimage',
-			platforms: ['linux'],
-			config: {
-				options: {
-					name: 'RoeLiteInstaller',
-					productName: 'RoeLite',
-					genericName: 'RoeLite Launcher',
-					description: 'Third party client for Oldschool Runescape and RSPS.',
-					categories: ['Game'],
-					icon: './src/img/RoeLite.png',
-					executableName: 'roelite',
-					mimeType: ['x-scheme-handler/roelite'],
-					desktop: {
-						Name: 'RoeLite',
-						Comment: 'Third party client for Oldschool Runescape and RSPS.',
-						Categories: 'Game;',
-						Terminal: 'false',
-						Type: 'Application',
-						Icon: 'roelite',
-						StartupWMClass: 'roelite',
-					},
-				},
-			},
-		},
 	],
 	plugins: [
 		{
 			name: '@electron-forge/plugin-auto-unpack-natives',
 			config: {},
-		},
-	],
-	publishers: [
-		{
-			name: '@electron-forge/publisher-github',
-			config: {
-				repository: {
-					owner: 'RoeLite69',
-					name: 'installer',
-				},
-				prerelease: false,
-				draft: true,
-			},
 		},
 	],
 };
