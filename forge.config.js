@@ -2,7 +2,6 @@ module.exports = {
 	packagerConfig: {
 		asar: true,
 		icon: './src/img/RoeLite',
-		out: './out',
 	},
 	makers: [
 		{
@@ -29,20 +28,10 @@ module.exports = {
 				name: 'RoeLiteInstaller',
 				title: 'RoeLite',
 				icon: './src/img/RoeLite.icns',
-				background: './src/img/dmg-background.png',
-				contents: [
-					{ x: 448, y: 344, type: 'link', path: '/Applications' },
-					{ x: 192, y: 344, type: 'file', path: './RoeLite.app' },
-				],
+				window: { width: 250, height: 150 },
 				format: 'ULFO',
 				overwrite: true,
 			},
-		},
-	],
-	plugins: [
-		{
-			name: '@electron-forge/plugin-auto-unpack-natives',
-			config: {},
 		},
 	],
 };

@@ -9,44 +9,12 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32",
-    "make:mac": "npm run package && electron-forge make --platform darwin",
-    "make:linux": "electron-builder --linux appimage",
+    "make:mac": "electron-forge make --platform=darwin",
     "prettier": "prettier --write \"**/*.js\"",
     "lint": "eslint src"
   },
   "config": {
     "forge": "./forge.config.js"
-  },
-  "build": {
-    "appId": "dev.roelite.app",
-    "productName": "RoeLite",
-    "directories": {
-      "output": "out"
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "icon": "./src/img/RoeLite.png",
-      "category": "Game",
-      "executableName": "roelite",
-      "synopsis": "Third party client for Oldschool Runescape and RSPS.",
-      "description": "RoeLite is a third party client for Oldschool Runescape and RSPS.",
-      "desktop": {
-        "Name": "RoeLite",
-        "Comment": "Third party client for Oldschool Runescape and RSPS.",
-        "Categories": "Game;",
-        "Terminal": "false",
-        "Type": "Application"
-      }
-    },
-    "appImage": {
-      "systemIntegration": "ask"
-    },
-    "files": [
-      "src/**/*",
-      "package.json"
-    ]
   },
   "keywords": [],
   "author": {
