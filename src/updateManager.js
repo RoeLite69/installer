@@ -5,6 +5,7 @@ const log = require('electron-log');
 const semver = require('semver');
 const { downloadFile, getLatestReleaseInfo, ROELITE_DIR } = require('./utils');
 const { exec } = require('child_process');
+const { tmpdir } = require('node:os');
 
 let cachedVersion = null;
 let cachedUrl = null;
@@ -45,7 +46,8 @@ async function downloadAndUpdate(window) {
 		});
 		sendVersionInfo(window, 'Installing', cachedVersion, true);
 		await installUpdate(installerPath);
-		app.exit(0);
+		sendVersionInfo(window, 'Restarting', cachedVersion, true);
+		restartApp();
 	} catch (error) {
 		log.error('Update failed:', error);
 		sendVersionInfo(window, 'Error', cachedVersion, false);
@@ -73,13 +75,26 @@ function installUpdate(installerPath) {
 				});
 				break;
 			case 'darwin':
-				exec(
-					`hdiutil attach "${installerPath}" && cp -R /Volumes/RoeLite/RoeLite.app /Applications/ && hdiutil detach /Volumes/RoeLite`,
-					error => {
-						if (error) reject(error);
-						else resolve();
-					},
-				);
+				const tempDir = fs.mkdtempSync(path.join(tmpdir(), 'roelite-update-'));
+				const mountPoint = path.join(tempDir, 'RoeLite');
+				const script = `
+          hdiutil attach "${installerPath}" -mountpoint "${mountPoint}" -nobrowse
+          cp -R "${mountPoint}/RoeLite.app" /Applications/
+          hdiutil detach "${mountPoint}"
+          rm -rf "${tempDir}"
+          rm "${installerPath}"
+        `;
+				exec(script, (error, stdout, stderr) => {
+					if (error) {
+						log.error('macOS update error:', error);
+						log.error('stdout:', stdout);
+						log.error('stderr:', stderr);
+						reject(error);
+					} else {
+						log.info('macOS update successful');
+						resolve();
+					}
+				});
 				break;
 			case 'linux':
 				fs.chmodSync(installerPath, '755');
@@ -92,6 +107,20 @@ function installUpdate(installerPath) {
 				reject(new Error('Unsupported platform'));
 		}
 	});
+}
+
+function restartApp() {
+	if (process.platform === 'darwin') {
+		const appPath = path.join('/Applications', 'RoeLite.app');
+		exec(`open "${appPath}"`, error => {
+			if (error) {
+				log.error('Failed to reopen app:', error);
+			}
+			app.quit();
+		});
+	} else {
+		app.exit(0);
+	}
 }
 
 module.exports = { checkForUpdates, downloadAndUpdate };
