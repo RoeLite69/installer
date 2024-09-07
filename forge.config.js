@@ -32,7 +32,7 @@ module.exports = {
 				background: './src/img/dmg-background.png',
 				contents: [
 					{ x: 448, y: 344, type: 'link', path: '/Applications' },
-					{ x: 192, y: 344, type: 'file' },
+					{ x: 192, y: 344, type: 'file', path: './RoeLite.app' },
 				],
 				format: 'ULFO',
 				overwrite: true,
