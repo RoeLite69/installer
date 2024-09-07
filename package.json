@@ -9,7 +9,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32",
-    "make:mac": "electron-forge make --platform darwin",
+    "make:mac": "npm run package && electron-forge make --platform darwin",
     "make:linux": "electron-builder --linux appimage",
     "prettier": "prettier --write \"**/*.js\"",
     "lint": "eslint src"

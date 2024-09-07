@@ -2,6 +2,7 @@ module.exports = {
 	packagerConfig: {
 		asar: true,
 		icon: './src/img/RoeLite',
+		out: './out',
 	},
 	makers: [
 		{
@@ -31,7 +32,7 @@ module.exports = {
 				background: './src/img/dmg-background.png',
 				contents: [
 					{ x: 448, y: 344, type: 'link', path: '/Applications' },
-					{ x: 192, y: 344, type: 'file', path: 'RoeLite.app' },
+					{ x: 192, y: 344, type: 'file' },
 				],
 				format: 'ULFO',
 				overwrite: true,
