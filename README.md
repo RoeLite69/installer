@@ -21,12 +21,12 @@ automatic updates, Java runtime management, and provides a user-friendly interfa
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/roelite-launcher.git
+   git clone https://github.com/RoeLite69/installer.git
    ```
 
 2. Navigate to the project directory:
    ```
-   cd roelite-launcher
+   cd installer
    ```
 
 3. Install dependencies:
@@ -98,6 +98,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 For support, please open an issue on the GitHub repository or contact the maintainers directly.
 
 ---
-
-Remember to replace `https://github.com/yourusername/roelite-launcher.git` with the actual repository URL when you set
-it up on GitHub or another platform.
