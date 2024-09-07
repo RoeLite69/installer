@@ -1,13 +1,13 @@
 html,
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212; /* Dark background for dark mode */
-    color: #ffffff; /* Light text color for contrast */
+    background-color: #121212;
+    color: #ffffff;
     height: 100%;
-    width: 100%; /* Make sure the html and body elements are at least as tall as the viewport */
-    margin: 0; /* Remove default margin */
+    width: 100%;
+    margin: 0;
     display: flex;
-    flex-direction: column; /* Stack content vertically */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: hidden;
@@ -15,62 +15,68 @@ body {
 }
 
 body {
-    transition: background-image 2s ease-in-out; /* Smooth transition for background image change */
-    background: no-repeat center center fixed; /* No repeat, centered, and fixed position */
-    background-size: 100% 100%; /* Stretch the background image to cover the entire screen */
+    transition: background-image 2s ease-in-out;
+    background: no-repeat center center fixed;
+    background-size: 100% 100%;
 }
 
 #buttonContainer {
     display: flex;
-    flex-wrap: wrap; /* Allow the container to wrap elements */
-    justify-content: space-evenly; /* Evenly space the elements */
-    gap: 10px; /* Reduced space between button groups */
-    width: 95%; /* Increased width */
-    top: 15px;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 10px;
+    width: 95%;
+    top: 20px;
     position: fixed;
 }
 
 .button-container {
     display: flex;
-    flex-direction: column; /* Stack logo and button vertically */
-    align-items: center; /* Center-align the contents */
-    width: 18%; /* Smaller width to fit more items per row */
+    flex-direction: column;
+    align-items: center;
+    width: 16%;
     background-color: rgba(0, 0, 0, 0.5);
-    padding: 3% 2.75%;
-    border-radius: 10px; /* Rounded corners */
+    padding: 3.5% 3.5%;
+    border-radius: 10px;
     margin-bottom: 1vh;
+    transition: transform 0.3s ease;
+}
+
+.button-container:hover {
+    transform: scale(1.1);
 }
 
 .button-logo {
-    pointer-events: none; /* Prevents dragging of images */
-    width: auto; /* Maintain aspect ratio */
-    height: 14vh; /* Adjusted height for more space */
-    margin-bottom: 10px; /* Reduced space between logo and button */
+    pointer-events: none;
+    width: auto;
+    height: 12vh;
+    max-height: 100px;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
 }
 
 button {
     position: relative;
-    padding: 2.5vh 2vw; /* Adjust padding for aesthetics */
-    white-space: nowrap; /* Keeps text on a single line */
-    overflow: hidden; /* Prevents text from spilling out */
-    text-overflow: ellipsis; /* Adds an ellipsis if text is too long */
+    padding: 1vh 1vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border: none;
     cursor: pointer;
-    font-size: 16px; /* Adjust font size as needed */
-    border-radius: 5px; /* Rounded corners */
-    transition: all 0.3s ease; /* Smooth transition for all changes */
+    font-size: 16px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     z-index: 0;
 }
 
-/* Differentiate play and download button colors */
 button.play {
-    background-color: #228f29; /* Green background */
+    background-color: #228f29;
     color: #ffffff;
 }
 
 button.play:hover {
-    background-color: #31c33a; /* Darker green on hover */
+    background-color: #31c33a;
 }
 
 button.play::before {
@@ -91,27 +97,31 @@ button.play.filling::before {
     width: 100%;
 }
 
-button.play.reset::before {
+button.play.filled::before {
+    width: 100%;
     transition: none;
-    width: 0;
 }
 
-/* Update button with distinct style */
+button.play.resetting::before {
+    width: 0;
+    transition: none;
+}
+
 button.update {
-    padding: 1vh 0; /* Adjust padding for aesthetics */
+    padding: 2vh 0;
     position: fixed;
-    bottom: 25px;
+    bottom: 8%;
     left: 50%;
-    transform: translateX(-50%); /* Center the button horizontally */
-    background-color: #f44336; /* Red background for attention */
+    transform: translateX(-50%);
+    background-color: #bc1b1b;
     color: #ffffff;
-    width: 300px; /* Fixed width for consistency */
-    font-size: 16px; /* Smaller font size */
-    border-radius: 10px; /* More pronounced rounded corners */
+    width: 75vw;
+    font-weight: bold;
+    border-radius: 10px;
 }
 
 button.update:hover {
-    background-color: #da190b; /* Darker red on hover */
+    background-color: #dd1d1d;
 }
 
 #version-footer {
@@ -119,9 +129,9 @@ button.update:hover {
     bottom: 0;
     width: 100%;
     text-align: center;
-    font-size: 14px; /* Smaller font size */
-    padding: 5px 0; /* Padding for visibility */
-    pointer-events: none;
+    font-size: 12px;
+    padding: 3px 0;
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 html,
@@ -130,8 +140,8 @@ button,
 #buttonContainer,
 .button-container,
 .button-logo {
-    -webkit-user-select: none; /* Chrome, Safari, Opera */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
