@@ -42,7 +42,7 @@ async function runJar(filePath, server) {
 async function downloadJarIfChanged(filePath) {
 	const jarName = path.basename(filePath);
 	const jarPath = path.join(ROELITE_DIR, jarName);
-	const remoteChecksum = await getChecksum(`launchers/${filePath}`);
+	const remoteChecksum = await getChecksum(`${jarName}`);
 	const localChecksum = await getFileChecksum(jarPath);
 	log.info('Checksums - Local:', localChecksum, 'Remote:', remoteChecksum);
 	if (localChecksum === remoteChecksum) {
@@ -57,7 +57,7 @@ async function downloadJarIfChanged(filePath) {
 		}
 	}
 	log.info('Downloading JAR from path:', filePath);
-	return downloadFile(filePath, jarPath);
+	return downloadFile(jarName, jarPath);
 }
 
 function canWriteToFile(filePath) {
@@ -75,17 +75,16 @@ function canWriteToFile(filePath) {
 	});
 }
 
-function downloadFile(filePath, destPath) {
+function downloadFile(filename, destPath) {
 	return new Promise((resolve, reject) => {
 		const fileStream = fs.createWriteStream(destPath);
 		const options = {
 			hostname: 'cloud.roelite.net',
 			port: 443,
-			path: '/files/download',
+			path: '/v2/dl/launchers',
 			method: 'GET',
 			headers: {
-				branch: 'dev',
-				filename: `launchers/${filePath}`,
+				filename: `${filename}`,
 			},
 			rejectUnauthorized: false,
 		};

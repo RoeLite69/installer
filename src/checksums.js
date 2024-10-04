@@ -3,22 +3,19 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 let checksums = {};
-let lastLoadTime = 0;
 
 function loadChecksums() {
 	return new Promise((resolve, reject) => {
 		const options = {
 			hostname: 'cloud.roelite.net',
 			port: 443,
-			path: '/files/download',
+			path: '/v2/dl/launchers',
 			method: 'GET',
 			headers: {
-				branch: 'dev',
-				filename: 'launchers/checksums.json',
+				filename: 'checksums.json',
 			},
 			rejectUnauthorized: false,
 		};
-
 		const request = https.get(options, function (response) {
 			if (response.statusCode === 200) {
 				let rawData = '';
@@ -28,7 +25,6 @@ function loadChecksums() {
 				response.on('end', () => {
 					try {
 						checksums = JSON.parse(rawData);
-						lastLoadTime = Date.now();
 						console.log('Checksums loaded into memory.');
 						console.log(JSON.stringify(checksums));
 						resolve();
@@ -45,7 +41,6 @@ function loadChecksums() {
 				reject(error);
 			}
 		});
-
 		request.on('error', function (e) {
 			console.error(`Problem with request: ${e.message}`);
 			reject(e);
@@ -55,16 +50,11 @@ function loadChecksums() {
 
 async function getChecksum(key) {
 	console.log('Getting checksum for', key);
-
-	const fifteenMinutes = 15 * 60 * 1000;
-	if (Date.now() - lastLoadTime > fifteenMinutes) {
-		try {
-			await loadChecksums();
-		} catch (error) {
-			console.error('Failed to reload checksums:', error);
-		}
+	try {
+		await loadChecksums();
+	} catch (error) {
+		console.error('Failed to reload checksums:', error);
 	}
-
 	return checksums[key] || null;
 }
 
@@ -86,4 +76,4 @@ function getFileChecksum(filePath) {
 	});
 }
 
-module.exports = { getChecksum, loadChecksums, getFileChecksum };
+module.exports = { getChecksum, getFileChecksum };
