@@ -61,7 +61,7 @@ async function setupHandlers() {
 	await checkJava(mainWindow);
 	await startLocalServer();
 	await checkForUpdates(mainWindow);
-	setInterval(() => checkForUpdates(mainWindow), 30 * 60 * 1000);
+	setInterval(() => checkForUpdates(mainWindow), 10 * 60 * 1000);
 	ipcMain.on('downloadAndUpdate', () => downloadAndUpdate(mainWindow));
 	ipcMain.on('runJar', (_, filePath, server) => runJar(filePath, server));
 }
