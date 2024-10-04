@@ -1,34 +1,42 @@
 const path = require('path');
+const { spawn } = require('child_process');
 const fs = require('fs').promises;
-const { exec } = require('child_process');
 const os = require('os');
+const app = require('electron').app;
 
 function setupSquirrelHandlers() {
-	if (process.platform !== 'win32') return false;
+	if (process.platform !== 'win32') {
+		return false;
+	}
 	const squirrelCommand = process.argv[1];
-	const appPath = path.resolve(process.execPath, '..');
-	const updateExe = path.resolve(appPath, '..', 'Update.exe');
 	const exeName = path.basename(process.execPath);
+	const updateExe = path.resolve(path.dirname(process.execPath), '..', 'Update.exe');
+	const run = args => {
+		return new Promise(resolve => {
+			console.log('Spawning `%s` with args `%s`', updateExe, args);
+			spawn(updateExe, args, {
+				detached: true,
+			}).on('close', resolve);
+		});
+	};
 	switch (squirrelCommand) {
 		case '--squirrel-install':
 		case '--squirrel-updated':
-			updateShortcuts(updateExe, exeName, true);
+			run(['--createShortcut=' + exeName]).then(() => {});
 			return true;
 		case '--squirrel-uninstall':
-			updateShortcuts(updateExe, exeName, false);
-			cleanupDirectories();
+			run(['--removeShortcut=' + exeName]).then(() => {
+				cleanupDirectories().then(() => {
+					app.quit();
+				});
+			});
 			return true;
 		case '--squirrel-obsolete':
+			app.quit();
 			return true;
 		default:
 			return false;
 	}
-}
-
-function updateShortcuts(updateExe, exeName, create) {
-	const locations = ['Desktop,StartMenu'];
-	const args = create ? ['--createShortcut', exeName] : ['--removeShortcut', exeName];
-	exec(`${updateExe} ${args.join(' ')} --shortcut-locations ${locations}`);
 }
 
 async function cleanupDirectories() {
@@ -40,7 +48,39 @@ async function cleanupDirectories() {
 		'C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\RoeLite',
 	];
 	for (const dir of directories) {
-		await fs.rmdir(dir).catch(() => {});
+		try {
+			await fs.rmdir(dir, { recursive: true });
+			console.log('Successfully removed directory:', dir);
+		} catch (error) {
+			console.log('Error removing directory:', dir, error);
+		}
+	}
+	// Remove RoeLite shortcuts
+	await removeRoeLiteShortcuts();
+}
+
+async function removeRoeLiteShortcuts() {
+	const shortcutLocations = [
+		path.join(os.homedir(), 'Desktop'),
+		path.join(os.homedir(), 'AppData', 'Roaming', 'Microsoft', 'Windows', 'Start Menu', 'Programs'),
+	];
+	for (const location of shortcutLocations) {
+		try {
+			const entries = await fs.readdir(location);
+			for (const entry of entries) {
+				if (entry.toLowerCase().includes('roelite') && path.extname(entry).toLowerCase() === '.lnk') {
+					const shortcutPath = path.join(location, entry);
+					try {
+						await fs.unlink(shortcutPath);
+						console.log('Removed RoeLite shortcut:', shortcutPath);
+					} catch (error) {
+						console.log('Error removing shortcut:', shortcutPath, error);
+					}
+				}
+			}
+		} catch (error) {
+			console.log('Error processing directory:', location, error);
+		}
 	}
 }
 

@@ -1,7 +1,16 @@
+const { version } = require('./package.json');
+
 module.exports = {
 	packagerConfig: {
 		asar: true,
 		icon: './src/img/RoeLite',
+		win32metadata: {
+			CompanyName: 'Roe',
+			FileDescription: 'Third party client for Oldschool Runescape and RSPS.',
+			OriginalFilename: 'RoeLite.exe',
+			ProductName: 'RoeLite',
+			InternalName: 'RoeLite',
+		},
 	},
 	makers: [
 		{
@@ -12,14 +21,17 @@ module.exports = {
 				authors: 'Roe',
 				exe: 'RoeLite.exe',
 				loadingGif: './src/img/loading.gif',
-				iconUrl: 'https://roelite.net/favicon.ico',
+				iconUrl: 'https://raw.githubusercontent.com/RoeLite69/installer/refs/heads/main/src/img/RoeLite.ico',
+				setupIcon: './src/img/RoeLite.ico',
+				icon: './src/img/RoeLite.ico',
 				noMsi: true,
 				remoteReleases: '',
 				shortcutName: 'RoeLite',
 				title: 'RoeLite',
 				setupExe: 'RoeLiteInstaller.exe',
-				setupIcon: './src/img/RoeLite.ico',
-				skipUpdateIcon: true,
+				skipUpdateIcon: false,
+				usePackageJson: false,
+				version: version,
 			},
 		},
 		{

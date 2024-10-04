@@ -3,9 +3,16 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 let checksums = {};
+let lastChecksumFetch = 0;
 
 function loadChecksums() {
 	return new Promise((resolve, reject) => {
+		const currentTime = Date.now();
+		if (currentTime - lastChecksumFetch < 120000) {
+			// 2 minutes in milliseconds
+			console.log('Using cached checksums');
+			return resolve(checksums);
+		}
 		const options = {
 			hostname: 'cloud.roelite.net',
 			port: 443,
@@ -27,7 +34,8 @@ function loadChecksums() {
 						checksums = JSON.parse(rawData);
 						console.log('Checksums loaded into memory.');
 						console.log(JSON.stringify(checksums));
-						resolve();
+						lastChecksumFetch = currentTime;
+						resolve(checksums);
 					} catch (e) {
 						console.error('Failed to parse checksums:', e.message);
 						reject(e);
@@ -62,7 +70,6 @@ function getFileChecksum(filePath) {
 	return new Promise((resolve, reject) => {
 		const hash = crypto.createHash('MD5');
 		const stream = fs.createReadStream(filePath);
-
 		stream.on('data', data => hash.update(data));
 		stream.on('end', () => resolve(hash.digest('hex')));
 		stream.on('error', error => {

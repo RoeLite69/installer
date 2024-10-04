@@ -12,7 +12,7 @@ let localServer;
 let store;
 
 if (setupSquirrelHandlers()) {
-	app.quit();
+	return;
 } else {
 	app.whenReady().then(async () => {
 		const Store = await import('electron-store');

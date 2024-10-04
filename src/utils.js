@@ -11,7 +11,8 @@ async function setupDirectories() {
 	await createDir(ROELITE_DIR);
 	await createDir(LOGS_DIR);
 	await fs.unlink(path.join(ROELITE_DIR, 'logs', 'electron.old.log'), () => {});
-	log.transports.file.resolvePathFn = () => path.join(ROELITE_DIR, 'logs', 'electron.log');
+	log.transports.file.resolvePathFn = () => path.join(LOGS_DIR, 'electron.log');
+	log.transports.file.level = 'info';
 }
 
 async function createDir(dir, extra) {

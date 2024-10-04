@@ -1,7 +1,7 @@
 {
   "name": "roelite",
   "description": "RoeLite",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "productName": "RoeLite",
   "main": "src/_main.js",
   "scripts": {
@@ -24,8 +24,8 @@
   "dependencies": {
     "electron-log": "^5.2.0",
     "electron-store": "^10.0.0",
-    "semver": "^7.6.3",
     "extract-zip": "^2.0.1",
+    "semver": "^7.6.3",
     "tar": "^7.4.3"
   },
   "devDependencies": {
