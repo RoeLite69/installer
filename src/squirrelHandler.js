@@ -5,12 +5,10 @@ const os = require('os');
 
 function setupSquirrelHandlers() {
 	if (process.platform !== 'win32') return false;
-
 	const squirrelCommand = process.argv[1];
 	const appPath = path.resolve(process.execPath, '..');
 	const updateExe = path.resolve(appPath, '..', 'Update.exe');
 	const exeName = path.basename(process.execPath);
-
 	switch (squirrelCommand) {
 		case '--squirrel-install':
 		case '--squirrel-updated':
@@ -41,7 +39,6 @@ async function cleanupDirectories() {
 		path.join(os.homedir(), 'AppData', 'Roaming', 'RoeLite'),
 		'C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\RoeLite',
 	];
-
 	for (const dir of directories) {
 		await fs.rmdir(dir).catch(() => {});
 	}
