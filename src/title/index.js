@@ -1,4 +1,4 @@
-const LAUNCHERS = ['OSRS', 'OSRSPS', 'OSNR', 'August'];
+const LAUNCHERS = ['OSRS', 'OSRSPS', 'OSNR', 'August', 'Relic'];
 const TOTAL_WALLPAPERS = 20;
 
 class Launcher {
