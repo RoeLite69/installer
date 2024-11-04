@@ -4,19 +4,33 @@ const crypto = require('crypto');
 
 let checksums = {};
 let lastChecksumFetch = 0;
+let loadingChecksums = null;
 
 function loadChecksums() {
+	const currentTime = Date.now();
+	if (currentTime - lastChecksumFetch < 300000) {
+		// 5 minutes in milliseconds
+		console.log('Using cached checksums');
+		return Promise.resolve(checksums);
+	}
+	if (loadingChecksums) {
+		// Return the ongoing promise
+		return loadingChecksums;
+	}
+	loadingChecksums = downloadChecksums('https://api.roelite.net/v2/dl/launchers');
+	return loadingChecksums;
+}
+
+function downloadChecksums(url, redirectCount = 0) {
 	return new Promise((resolve, reject) => {
-		const currentTime = Date.now();
-		if (currentTime - lastChecksumFetch < 120000) {
-			// 2 minutes in milliseconds
-			console.log('Using cached checksums');
-			return resolve(checksums);
+		if (redirectCount > 5) {
+			return reject(new Error('Too many redirects while loading checksums'));
 		}
+		const parsedUrl = new URL(url);
 		const options = {
-			hostname: 'cloud.roelite.net',
-			port: 443,
-			path: '/v2/dl/launchers',
+			hostname: parsedUrl.hostname,
+			port: parsedUrl.port || 443,
+			path: parsedUrl.pathname + parsedUrl.search,
 			method: 'GET',
 			headers: {
 				filename: 'checksums.json',
@@ -34,23 +48,35 @@ function loadChecksums() {
 						checksums = JSON.parse(rawData);
 						console.log('Checksums loaded into memory.');
 						console.log(JSON.stringify(checksums));
-						lastChecksumFetch = currentTime;
+						lastChecksumFetch = Date.now();
+						loadingChecksums = null;
 						resolve(checksums);
 					} catch (e) {
 						console.error('Failed to parse checksums:', e.message);
+						loadingChecksums = null;
 						reject(e);
 					}
 				});
+			} else if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+				// Handle redirect
+				const newUrl = response.headers.location;
+				console.log(`Redirecting to ${newUrl}`);
+				request.abort();
+				downloadChecksums(newUrl, redirectCount + 1)
+					.then(resolve)
+					.catch(reject);
 			} else {
 				const error = new Error(
 					`Failed to download checksums.json: Server responded with status code ${response.statusCode}`,
 				);
 				console.error(error.message);
+				loadingChecksums = null;
 				reject(error);
 			}
 		});
 		request.on('error', function (e) {
 			console.error(`Problem with request: ${e.message}`);
+			loadingChecksums = null;
 			reject(e);
 		});
 	});

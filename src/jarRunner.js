@@ -75,13 +75,17 @@ function canWriteToFile(filePath) {
 	});
 }
 
-function downloadFile(filename, destPath) {
+function downloadFile(filename, destPath, redirectCount = 0, url = 'https://api.roelite.net/v2/dl/launchers') {
 	return new Promise((resolve, reject) => {
+		if (redirectCount > 5) {
+			return reject(new Error('Too many redirects'));
+		}
 		const fileStream = fs.createWriteStream(destPath);
+		const parsedUrl = new URL(url);
 		const options = {
-			hostname: 'cloud.roelite.net',
-			port: 443,
-			path: '/v2/dl/launchers',
+			hostname: parsedUrl.hostname,
+			port: parsedUrl.port || 443,
+			path: parsedUrl.pathname + parsedUrl.search,
 			method: 'GET',
 			headers: {
 				filename: `${filename}`,
@@ -89,12 +93,24 @@ function downloadFile(filename, destPath) {
 			rejectUnauthorized: false,
 		};
 		const request = https.get(options, response => {
-			if (response.statusCode === 200) {
+			if (response.statusCode >= 200 && response.statusCode < 300) {
 				response.pipe(fileStream);
 				fileStream.on('finish', () => {
 					fileStream.close(() => {
 						log.info(`${path.basename(destPath)} downloaded successfully.`);
 						resolve(destPath);
+					});
+				});
+			} else if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+				// Handle redirect
+				const newUrl = response.headers.location;
+				log.info(`Redirecting to ${newUrl}`);
+				fileStream.close(() => {
+					fs.unlink(destPath, () => {
+						// Now make the new request
+						downloadFile(filename, destPath, redirectCount + 1, newUrl)
+							.then(resolve)
+							.catch(reject);
 					});
 				});
 			} else {
