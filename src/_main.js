@@ -5,6 +5,7 @@ const { checkJava } = require('./javaManager');
 const { runJar } = require('./jarRunner');
 const { setupSquirrelHandlers } = require('./squirrelHandler');
 const { setupDirectories } = require('./utils');
+const { getJagexAccounts, deleteJagexAccountCredentialsFromRunelite, copyJagexAccountCredentialsToRunelite } = require('./jagexAccountManager');
 const http = require('http');
 
 let mainWindow;
@@ -44,11 +45,13 @@ async function createWindow() {
 		},
 		icon: path.join(__dirname, './img/roelite.ico'),
 	});
-	await mainWindow.loadFile(path.join(__dirname, './title/index.html'));
+	// Open devtools if needed - Vibblez
+	//mainWindow.webContents.openDevTools();
+	await mainWindow.loadFile(path.join(__dirname, './title/index.html'));	
 	mainWindow.setFullScreenable(false);
 	mainWindow.setMenuBarVisibility(false);
 	mainWindow.setTitle('RoeLite Launcher');
-	mainWindow.setMinimumSize(500, 400);
+	mainWindow.setMinimumSize(500, 400);	
 	// Save window state on close
 	mainWindow.on('close', () => {
 		const { width, height } = mainWindow.getBounds();
@@ -60,10 +63,14 @@ async function createWindow() {
 async function setupHandlers() {
 	await checkJava(mainWindow);
 	await startLocalServer();
+	await getJagexAccounts(mainWindow);
 	await checkForUpdates(mainWindow);
 	setInterval(() => checkForUpdates(mainWindow), 10 * 60 * 1000);
 	ipcMain.on('downloadAndUpdate', () => downloadAndUpdate(mainWindow));
 	ipcMain.on('runJar', (_, filePath, server) => runJar(filePath, server));
+	ipcMain.handle('refreshJagexAccounts', () => getJagexAccounts(mainWindow));
+	ipcMain.handle('deleteJagexAccountCreds', () => deleteJagexAccountCredentialsFromRunelite());
+	ipcMain.handle('copyJagexAccountCreds', (_, account) => copyJagexAccountCredentialsToRunelite(account));
 }
 
 app.on('window-all-closed', () => {

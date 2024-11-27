@@ -4,12 +4,15 @@ const os = require('os');
 const https = require('https');
 const log = require('electron-log');
 
+const RUNELITE_DIR = path.join(os.homedir(), '.runelite');
 const ROELITE_DIR = path.join(os.homedir(), '.roelite');
 const LOGS_DIR = path.join(ROELITE_DIR, 'logs');
+const ACCOUNTS_DIR = path.join(ROELITE_DIR, 'jagex_accounts');
 
 async function setupDirectories() {
 	await createDir(ROELITE_DIR);
 	await createDir(LOGS_DIR);
+	await createDir(ACCOUNTS_DIR);
 	await fs.unlink(path.join(ROELITE_DIR, 'logs', 'electron.old.log'), () => {});
 	log.transports.file.resolvePathFn = () => path.join(LOGS_DIR, 'electron.log');
 	log.transports.file.level = 'info';
@@ -136,4 +139,15 @@ function fetchData(url) {
 	});
 }
 
-module.exports = { ROELITE_DIR, setupDirectories, downloadFile, getLatestReleaseInfo };
+// Function only returns accounts with credentials.properties - Vibblez
+function getDirectories(dir) {
+    return fs.readdirSync(dir, { withFileTypes: true })
+        .filter(dirent => {
+            if (!dirent.isDirectory()) return false;
+            const credentialsPath = path.join(dir, dirent.name, 'credentials.properties');
+            return fs.existsSync(credentialsPath);
+        })
+        .map(dirent => dirent.name);
+}
+
+module.exports = { ROELITE_DIR, ACCOUNTS_DIR, RUNELITE_DIR, setupDirectories, downloadFile, getLatestReleaseInfo, getDirectories };
