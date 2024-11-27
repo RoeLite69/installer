@@ -71,6 +71,10 @@ button {
 }
 
 button.play {
+    margin-top: 5px;
+}
+
+button.play {
     background-color: #228f29;
     color: #ffffff;
 }
@@ -122,6 +126,12 @@ button.update {
 
 button.update:hover {
     background-color: #dd1d1d;
+}
+
+.select-list {
+    border-radius: 5px;
+    padding: 5px;
+    width: 100%;
 }
 
 #version-footer {
