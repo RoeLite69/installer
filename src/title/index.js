@@ -8,6 +8,8 @@ class Launcher {
 		this.buttonContainer = document.getElementById('buttonContainer');
 		this.updateButton = document.getElementById('updateButton');
 		this.versionFooter = document.getElementById('version-footer');
+		this.OSRSAccounts = ['No Jagex Account Found'];
+		this.selectedAccount = 'empty';
 		this.cachedVersionInfo = {
 			jdk: 'Unknown',
 			local: 'Unknown',
@@ -46,6 +48,12 @@ class Launcher {
 		window.api.onVersionInfo(this.handleVersionInfo.bind(this));
 		window.api.onUpdateProgress(this.handleUpdateProgress.bind(this));
 		window.api.onResetButton(this.handleResetButton.bind(this));
+		window.api.onJagexAccounts(this.handleJagexAccounts.bind(this));
+	}
+
+	handleJagexAccounts(accounts) {
+		this.OSRSAccounts = accounts;
+		this.handleRefreshOSRSAccountsSelectListUpdate();
 	}
 
 	handleVersionInfo({ jdk, local, remote, update } = {}) {
@@ -78,22 +86,91 @@ class Launcher {
 			progress === 100 ? 'Restarting Launcher...' : `Updating Launcher (${progress.toFixed(1)}%)...`;
 	}
 
+	handleRefreshOSRSAccounts() {
+		console.log('Refreshing OSRS Accounts');
+		window.api.RefreshJagexAccounts()
+			.then(() => {
+				this.handleRefreshOSRSAccountsSelectListUpdate();
+			})
+			.catch(error => {
+				console.error('Error refreshing accounts:', error);
+			});
+	}
+
+	handleRefreshOSRSAccountsSelectListUpdate() {
+		const selectList = document.getElementById('account-select');
+		if(this.OSRSAccounts.length > 0){
+			selectList.innerHTML = '';
+		}
+		this.createSelectList(selectList);
+	}
+
+	handleSelectAccount(account) {
+		this.selectedAccount = account;
+		if(account !== 'empty'){
+			window.api.copyJagexAccountCreds(account);
+		} else {
+			window.api.deleteJagexAccountCreds();
+		}
+	}
+
+	createSelectList(selectList) {
+		const defaultOption = document.createElement('option');
+		defaultOption.value = 'empty';
+		defaultOption.textContent = 'User/Pass';
+		selectList.appendChild(defaultOption);
+		console.log('OSRS Accounts:', this.OSRSAccounts);
+		if(this.OSRSAccounts.length > 0){
+			this.OSRSAccounts.forEach(account => {
+			const option = document.createElement('option');
+			if(account === 'No Jagex Account Found'){
+				option.disabled = true;
+			}
+			option.value = account;
+			option.textContent = account;
+				selectList.appendChild(option);
+			});
+		}
+		return selectList;
+	}
+
 	createLauncherButtons() {
 		LAUNCHERS.forEach(name => {
+			let showRefresh = false;
 			const buttonContainer = document.createElement('div');
 			buttonContainer.className = 'button-container';
 			const logo = document.createElement('img');
 			logo.src = `../img/${name.toLowerCase()}.png`;
 			logo.className = 'button-logo';
-			const button = this.createButton(name);
+			const selectListContainer = document.createElement('div');
+			selectListContainer.className = 'select-list-container';
+			if(name === 'OSRS'){
+				showRefresh = true;
+				const selectList = document.createElement('select');
+				selectList.addEventListener('change', () => this.handleSelectAccount(selectList.value));
+				selectList.name = 'account-select';
+				selectList.id = 'account-select';
+				selectList.className = 'select-list';
+				this.createSelectList(selectList);
+				selectListContainer.appendChild(selectList);
+			}
+			const button = this.createButton(name);			
 			this.buttons.set(name.toLowerCase(), button);
+			const refreshButton = document.createElement('button');
+			refreshButton.textContent = 'Refresh Accounts';
+			refreshButton.className = 'play';
+			refreshButton.addEventListener('click', () => this.handleRefreshOSRSAccounts());
 			const progressBarContainer = document.createElement('div');
 			progressBarContainer.className = 'progress-bar';
 			const progressBar = document.createElement('div');
 			progressBar.id = `progress-${name}`;
 			progressBar.className = 'progress-bar-value';
 			progressBarContainer.appendChild(progressBar);
-			buttonContainer.append(logo, button, progressBarContainer);
+			if(showRefresh){
+				buttonContainer.append(logo, selectListContainer, refreshButton, button, progressBarContainer);
+			} else {
+				buttonContainer.append(logo, selectListContainer, button, progressBarContainer);
+			}
 			this.buttonContainer.appendChild(buttonContainer);
 		});
 	}
