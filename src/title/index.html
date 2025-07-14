@@ -4,12 +4,661 @@
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 	<title>RoeLite Launcher</title>
-	<link href="./index.css" rel="stylesheet">
+	<style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      html, body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background-color: #0a0a0a;
+          color: #ffffff;
+          height: 100vh;
+          width: 100vw;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          font-weight: 400;
+      }
+
+      body {
+          background: no-repeat center center fixed;
+          background-size: cover;
+          transition: background-image 2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8));
+          backdrop-filter: blur(1px);
+          z-index: 1;
+      }
+
+      #app-container {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 600px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 0.25rem;
+          padding: 1.5rem 1rem 1rem;
+          margin: 0 auto;
+          transition: all 0.3s ease;
+      }
+
+      #app-container.has-update {
+          padding-bottom: 100px;
+      }
+
+      .featured-section,
+      .servers-section {
+          width: 100%;
+          margin-bottom: 0.1rem;
+          position: relative;
+          animation: fadeInUp 0.6s ease backwards;
+      }
+
+      .servers-section {
+          flex: 1;
+          min-height: 0;
+          z-index: 10;
+          animation-delay: 0.3s;
+          overflow-y: auto;
+          overflow-x: hidden;
+          max-height: calc(100vh - 100px);
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 107, 53, 0.3) rgba(255, 255, 255, 0.1);
+      }
+
+      .servers-section::-webkit-scrollbar {
+          width: 6px;
+      }
+
+      .servers-section::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+      }
+
+      .servers-section::-webkit-scrollbar-thumb {
+          background: rgba(255, 107, 53, 0.3);
+      }
+
+      .servers-section::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 107, 53, 0.5);
+      }
+
+      .servers-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.5rem;
+          padding: 12px 8px 36px 8px;
+      }
+
+      .button-container,
+      .button-container.osrs {
+          position: relative;
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem;
+          text-align: center;
+          height: 140px;
+          transition: all 0.3s ease;
+          animation: fadeInUp 0.4s ease backwards;
+          overflow: hidden;
+      }
+
+      .button-container.osrs {
+          flex-direction: row;
+          justify-content: center;
+          background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(247, 147, 30, 0.1), rgba(255, 215, 0, 0.15));
+          border: 1px solid rgba(255, 107, 53, 0.3);
+          box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);
+          height: 100px;
+          animation: glow 3s ease-in-out infinite;
+          padding: 1rem;
+      }
+
+      .button-container:hover,
+      .button-container.osrs:hover {
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+          transform: none;
+          z-index: 10;
+      }
+
+      .button-container::before,
+      .button-container.osrs::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 16px;
+          background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s ease;
+      }
+
+      .button-container:hover::before,
+      .button-container.osrs:hover::before {
+          opacity: 1;
+      }
+
+      .logo-container {
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+      }
+
+      .osrs-logo {
+          width: auto;
+          height: 80px;
+          object-fit: contain;
+          filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+          transition: transform 0.3s ease;
+      }
+
+      .button-logo {
+          width: auto;
+          height: 48px;
+          object-fit: contain;
+          filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+          transition: transform 0.3s ease;
+      }
+
+      .button-container:hover .button-logo,
+      .button-container.osrs:hover .osrs-logo {
+          transform: scale(1.03);
+      }
+
+      .osrs-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          text-align: center;
+      }
+
+      .osrs-title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          background: linear-gradient(135deg, #ff6b35, #f7931e);
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+      }
+
+      .game-title {
+          font-size: 0.9rem;
+          font-weight: 600;
+          line-height: 1.2;
+          text-align: center;
+          margin: 6px 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+      }
+
+      .osrs-button,
+      button.play {
+          position: relative;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          font-family: inherit;
+          text-transform: uppercase;
+          background: linear-gradient(135deg, #3bd81f, #2da80a);
+          color: #ffffff;
+          transition: all 0.3s ease;
+          overflow: hidden;
+      }
+
+      .osrs-button {
+          padding: 0.65rem 1.5rem;
+          font-size: 0.95rem;
+          box-shadow: 0 2px 8px rgba(21, 163, 5, 0.4);
+          width: 70%;
+      }
+
+      button.play {
+          padding: 0.5rem 1rem;
+          font-size: 0.9rem;
+          width: 100%;
+          box-shadow: 0 2px 8px rgba(21, 163, 5, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+          height: 38px;
+      }
+
+      .osrs-button:hover:not(:disabled),
+      button.play:hover:not(:disabled) {
+          background: linear-gradient(135deg, #4cd334, #35b910);
+          box-shadow: 0 8px 25px rgba(33, 185, 16, 0.4);
+      }
+
+      .osrs-button:disabled,
+      button.play:disabled {
+          background: linear-gradient(135deg, #6b7280, #4b5563);
+          color: #9ca3af;
+          cursor: not-allowed;
+          box-shadow: none;
+      }
+
+      .osrs-button::before,
+      button.play::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 0;
+          height: 100%;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.2) 100%);
+          background-size: 200% 100%;
+          background-position: left;
+          transition: width 10s linear, background-position 10s linear;
+          z-index: 1;
+      }
+
+      .osrs-button.filling::before,
+      button.play.filling::before {
+          width: 100%;
+          background-position: right;
+      }
+
+      .osrs-button.filled::before,
+      button.play.filled::before {
+          width: 100%;
+          transition: none;
+      }
+
+      .osrs-button.resetting::before,
+      button.play.resetting::before {
+          width: 0;
+          transition: none;
+      }
+
+      .osrs-button span,
+      button.play span {
+          position: relative;
+          z-index: 2;
+      }
+
+      button.update {
+          position: fixed;
+          bottom: 50px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #dc2626, #b91c1c);
+          color: #ffffff;
+          padding: 0.75rem 1rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border-radius: 12px;
+          box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+          z-index: 10;
+          backdrop-filter: blur(20px);
+          width: 90%;
+          max-width: 90vw;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          border: none;
+      }
+
+      button.update:hover:not(:disabled) {
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+          box-shadow: 0 12px 35px rgba(220, 38, 38, 0.5);
+          transform: translateX(-50%) translateY(-3px);
+      }
+
+      button.update:disabled {
+          background: linear-gradient(135deg, #6b7280, #4b5563);
+          cursor: not-allowed;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      }
+
+      #version-footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+          backdrop-filter: blur(20px);
+          padding: 0.5rem;
+          text-align: center;
+          font-size: 0.8rem;
+          font-weight: 400;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          z-index: 5;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .status-indicator {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          margin-right: 0.5rem;
+          background: #1bb910;
+          box-shadow: 0 0 8px rgba(47, 185, 16, 0.5);
+          cursor: help;
+      }
+
+      .status-indicator.offline {
+          background: #ef4444;
+          box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+      }
+
+      @keyframes glow {
+          0%, 100% {
+              box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);
+          }
+          50% {
+              box-shadow: 0 8px 32px rgba(255, 107, 53, 0.4);
+          }
+      }
+
+      @keyframes fadeInUp {
+          from {
+              opacity: 0;
+              transform: translateY(20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+
+      html, body, button, .button-container, .button-logo, .game-title, .osrs-title {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+      }
+
+	</style>
 </head>
 <body>
-<div id="buttonContainer"></div>
-<button class="update" id="updateButton" style="display: none;"></button>
-<footer id="version-footer"></footer>
-<script src="./index.js"></script>
+<div id="app-container">
+	<div class="featured-section">
+		<!-- OSRS will be inserted here -->
+	</div>
+
+	<div class="servers-section">
+		<div class="servers-grid" id="buttonContainer">
+			<!-- Other servers will be inserted here -->
+		</div>
+	</div>
+
+	<button class="update" id="updateButton" style="display: none;"></button>
+</div>
+
+<footer id="version-footer">
+	<span class="status-indicator"></span>
+	Loading launcher information...
+</footer>
+
+<script>
+	const LAUNCHERS = ['OSRS', 'OSNR', 'August'];
+	const TOTAL_WALLPAPERS = 20;
+
+	class Launcher {
+		constructor() {
+			this.updateInfo = { update: false, localVer: '1.0.0', latestVer: '1.0.0' };
+			this.javaInstalled = false;
+			this.buttonContainer = document.getElementById('buttonContainer');
+			this.featuredSection = document.querySelector('.featured-section');
+			this.updateButton = document.getElementById('updateButton');
+			this.versionFooter = document.getElementById('version-footer');
+			this.cachedVersionInfo = {
+				jdk: 'Unknown',
+				local: 'Unknown',
+				remote: 'Unknown',
+				update: false,
+			};
+			this.buttons = new Map();
+			this.init();
+		}
+
+		init() {
+			this.setRandomBackground();
+			this.startBackgroundRotation();
+			this.setupEventListeners();
+			this.createLauncherButtons();
+		}
+
+		setRandomBackground() {
+			const randomWallpaperNumber = Math.floor(Math.random() * TOTAL_WALLPAPERS) + 1;
+			document.body.style.backgroundImage = `url('../img/wallpapers/${randomWallpaperNumber}.webp')`;
+		}
+
+		startBackgroundRotation() {
+			const minInterval = 60000; // 1 minute
+			const maxInterval = 300000; // 5 minutes
+			setInterval(
+				() => this.setRandomBackground(),
+				Math.random() * (maxInterval - minInterval) + minInterval,
+			);
+		}
+
+		setupEventListeners() {
+			window.api.onVersionInfo(this.handleVersionInfo.bind(this));
+			window.api.onUpdateProgress(this.handleUpdateProgress.bind(this));
+			window.api.onResetButton(this.handleResetButton.bind(this));
+		}
+
+		handleVersionInfo({ jdk, local, remote, update } = {}) {
+			// Update cached values with new information, if provided
+			this.cachedVersionInfo = {
+				jdk: jdk || this.cachedVersionInfo.jdk,
+				local: local || this.cachedVersionInfo.local,
+				remote: remote || this.cachedVersionInfo.remote,
+				update: update !== undefined ? update : this.cachedVersionInfo.update,
+			};
+
+			const { jdk: cachedJdk, local: cachedLocal, remote: cachedRemote, update: cachedUpdate } = this.cachedVersionInfo;
+
+			// Update version footer with status indicator
+			const isJavaValid = cachedJdk === '11.0.22';
+			const statusText = isJavaValid ? 'Java is properly installed' : 'Java 11.0.22 is required';
+
+			this.versionFooter.innerHTML = `
+                    <span class="status-indicator ${isJavaValid ? '' : 'offline'}" title="${statusText}"></span>
+                    Java: ${cachedJdk || 'Unknown'} | Launcher: ${cachedLocal || 'Unknown'}
+                `;
+
+			this.javaInstalled = isJavaValid;
+			this.updateInfo = {
+				update: cachedUpdate,
+				localVer: cachedLocal,
+				latestVer: cachedRemote,
+			};
+
+			this.updateLauncherButtons();
+			this.updateUpdateButton();
+		}
+
+		handleUpdateProgress({ progress }) {
+			this.updateButton.textContent =
+				progress === 100 ? 'Restarting Launcher...' : `Updating Launcher (${progress.toFixed(1)}%)...`;
+		}
+
+		createLauncherButtons() {
+			// Create OSRS featured section
+			const osrsData = LAUNCHERS.find(name => name === 'OSRS');
+			if (osrsData) {
+				this.createOSRSFeatured(osrsData);
+			}
+
+			// Create other servers
+			LAUNCHERS.filter(name => name !== 'OSRS').forEach(name => {
+				const buttonContainer = document.createElement('div');
+				buttonContainer.className = 'button-container';
+
+				const logoContainer = document.createElement('div');
+				logoContainer.className = 'logo-container';
+
+				const logo = document.createElement('img');
+				logo.src = `../img/${name.toLowerCase()}.png`;
+				logo.className = 'button-logo';
+				logo.onerror = () => logo.src = '../img/osrs.png';
+
+				logoContainer.appendChild(logo);
+
+				const gameTitle = document.createElement('div');
+				gameTitle.className = 'game-title';
+				gameTitle.textContent = this.getServerDisplayName(name);
+
+				const button = this.createButton(name);
+				this.buttons.set(name.toLowerCase(), button);
+
+				buttonContainer.append(logoContainer, gameTitle, button);
+				this.buttonContainer.appendChild(buttonContainer);
+			});
+		}
+
+		createOSRSFeatured(name) {
+			const buttonContainer = document.createElement('div');
+			buttonContainer.className = 'button-container osrs';
+
+			const logo = document.createElement('img');
+			logo.src = `../img/${name.toLowerCase()}.png`;
+			logo.className = 'osrs-logo';
+
+			const content = document.createElement('div');
+			content.className = 'osrs-content';
+
+			const title = document.createElement('div');
+			title.className = 'osrs-title';
+			title.textContent = 'Old School RuneScape';
+
+			const button = document.createElement('button');
+			button.className = 'osrs-button';
+			button.innerHTML = '<span>PLAY</span>';
+			button.addEventListener('click', () => this.handlePlay(button, name));
+
+			this.buttons.set(name.toLowerCase(), button);
+
+			content.append(title, button);
+			buttonContainer.append(logo, content);
+			this.featuredSection.appendChild(buttonContainer);
+		}
+
+		getServerDisplayName(name) {
+			const displayNames = {
+				'OSRS': 'Old School RuneScape',
+				'OSNR': 'Near Reality',
+				'August': 'August',
+			};
+			return displayNames[name] || name;
+		}
+
+		createButton(name) {
+			const button = document.createElement('button');
+			button.className = 'play';
+			button.innerHTML = '<span>PLAY</span>';
+			button.addEventListener('click', () => this.handlePlay(button, name));
+			return button;
+		}
+
+		handlePlay(button, name) {
+			if (button.disabled || !this.javaInstalled) return;
+			window.api.runJar('Launcher.jar', name.toLowerCase());
+			this.animateButton(button);
+		}
+
+		animateButton(button) {
+			this.resetButtonImmediate(button);
+			button.disabled = true;
+			button.style.backgroundColor = '#213c24';
+			void button.offsetWidth; // Force reflow
+			button.classList.add('filling');
+			setTimeout(() => {
+				button.classList.remove('filling');
+				button.classList.add('filled');
+				this.resetButton(button);
+			}, 10000);
+		}
+
+		resetButton(button) {
+			button.disabled = false;
+			button.style.backgroundColor = '';
+			this.resetButtonImmediate(button);
+		}
+
+		resetButtonImmediate(button) {
+			button.classList.remove('filling', 'filled');
+			button.classList.add('resetting');
+			void button.offsetWidth; // Force reflow
+			button.classList.remove('resetting');
+		}
+
+		handleResetButton(serverName) {
+			const button = this.buttons.get(serverName.toLowerCase());
+			if (button) {
+				this.resetButton(button);
+			}
+		}
+
+		updateLauncherButtons() {
+			this.buttons.forEach(button => {
+				button.disabled = !this.javaInstalled;
+			});
+		}
+
+		updateUpdateButton() {
+			const { update, localVer, latestVer } = this.updateInfo;
+			const appContainer = document.getElementById('app-container');
+
+			this.updateButton.style.display = update ? 'block' : 'none';
+			appContainer.classList.toggle('has-update', update);
+
+			if (update) {
+				this.updateButton.textContent = `Update Available: ${localVer} → ${latestVer}`;
+				this.updateButton.onclick = () => {
+					if (this.javaInstalled) {
+						window.api.downloadAndUpdate();
+						this.updateButton.disabled = true;
+						this.updateButton.textContent = 'Updating (0%)...';
+					}
+				};
+			}
+		}
+	}
+
+	document.addEventListener('DOMContentLoaded', () => new Launcher());
+</script>
 </body>
 </html>
